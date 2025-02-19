@@ -13,6 +13,9 @@ export default {
         foreground: "var(--foreground)",
       },
     },
+    fontFamily: {
+      "nanumround": ["NanumSquareRound"],
+    }
   },
   plugins: [],
 } satisfies Config;
