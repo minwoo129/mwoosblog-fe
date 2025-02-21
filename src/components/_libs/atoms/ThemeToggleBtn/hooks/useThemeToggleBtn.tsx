@@ -1,14 +1,17 @@
-import {useMemo} from 'react';
+import {ThemeType} from '@/constants/Themes';
+import {useTheme} from 'next-themes';
+import {useEffect, useMemo, useState} from 'react';
 
-const useThemeToggleBtn = ({
-  theme,
-  systemTheme,
-}: {
-  systemTheme: 'dark' | 'light' | undefined;
-  theme: string | undefined;
-}) => {
+const useThemeToggleBtn = () => {
+  const [mounted, setMounted] = useState(false);
+  const {theme, systemTheme, setTheme} = useTheme();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const currentTheme = useMemo(() => {
-    let currentTheme: 'light' | 'dark' = 'light';
+    let currentTheme: ThemeType = 'light';
     if (!theme || !systemTheme) {
       return currentTheme;
     }
@@ -17,12 +20,18 @@ const useThemeToggleBtn = ({
       return systemTheme;
     }
 
-    currentTheme = theme as 'light' | 'dark';
+    currentTheme = theme as ThemeType;
 
     return currentTheme;
   }, [theme, systemTheme]);
 
-  return {currentTheme};
+  const handleToggleClick = (type: ThemeType) => {
+    setTheme(type);
+  };
+
+  return {mounted, currentTheme, handleToggleClick};
+
+  // return {currentTheme};
 };
 
 export default useThemeToggleBtn;
