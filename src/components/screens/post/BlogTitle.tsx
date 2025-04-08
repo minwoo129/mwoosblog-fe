@@ -20,8 +20,8 @@ const BlogTitle = async ({
     await getPlaceholderImage(thumbnailImg);
   return (
     <header>
-      <h1 className="mb-0">{title}</h1>
-      <div className="flex gap-3">
+      <h1 className="mb-0 text-white">{title}</h1>
+      <div className="flex gap-3 text-white">
         <p>{dayjs(createdAt).format('YYYY년 MM월 DD일')}</p>
         <p>({tags.map((tag, i) => `${i ? ', ' : ''}${tag}`)})</p>
       </div>
