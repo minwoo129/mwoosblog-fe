@@ -3,6 +3,10 @@ import type {Metadata} from 'next';
 import './css/globals.css';
 import {ThemeProvider} from 'next-themes';
 import BasicLayout from '@/components/_libs/templates/BasicLayout';
+import 'dayjs/locale/ko';
+import dayjs from 'dayjs';
+
+dayjs.locale('ko');
 
 export const metadata: Metadata = {
   title: 'Create Next App',

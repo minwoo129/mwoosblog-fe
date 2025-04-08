@@ -15,6 +15,14 @@ const nextConfig: NextConfig = {
   /* config options here */
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
   reactStrictMode: true,
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'velog.velcdn.com',
+      },
+    ],
+  },
 };
 
 export default withMDX(nextConfig);
