@@ -7,7 +7,7 @@ interface NavBtnProps extends Omit<ComponentProps<typeof Link>, 'children'> {
 
 const Navigation = ({}) => {
   return (
-    <div className="w-full flex flex-row justify-between items-center px-4 py-2 drop-shadow-2xl ">
+    <div className="w-full flex flex-row justify-between items-center px-4 py-2 drop-shadow-2xl sticky">
       <Logo />
       <div className="flex flex-row gap-4">
         {/* <NavBtn href="/">Home</NavBtn> */}
