@@ -26,7 +26,7 @@ const BlogTitle = async ({
         <p>({tags.map((tag, i) => `${i ? ', ' : ''}${tag}`)})</p>
       </div>
       <hr className="mt-0" />
-      <div className="mx-auto aspect-video md:w-2/3">
+      <div className="mx-auto aspect-video">
         <Image
           src={src}
           alt={`${title} 포스터 이미지`}
