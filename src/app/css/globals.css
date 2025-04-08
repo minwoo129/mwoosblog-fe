@@ -4,8 +4,8 @@
 @import './prism.css';
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #242427;
+  --foreground: #ededed;
 }
 
 /* @media (prefers-color-scheme: dark) {
