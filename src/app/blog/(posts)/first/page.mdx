@@ -8,6 +8,30 @@ This is a list in markdown:
 - Two
 - Three
 
+## code test
+
+```tsx showLineNumbers
+import React from 'react';
+import '@css/App.css';
+import {Button, Calendar} from '@admin/ui';
+
+const Main = () => {
+  return (
+    <div>
+      <h1>Main</h1>
+      <Button color="primary" />
+      <Calendar
+        onSelect={(date, selectInfo) => {}}
+        onPanelChange={(date, mode) => {}}
+        cellRender={}
+      />
+    </div>
+  );
+};
+
+export default Main;
+```
+
 Checkout my React component:
 
 export const metadata = {
