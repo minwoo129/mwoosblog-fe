@@ -7,8 +7,8 @@ const useThemeToggleBtn = () => {
   const {theme, systemTheme, setTheme} = useTheme();
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    if (!mounted) setMounted(true);
+  }, [mounted]);
 
   const currentTheme = useMemo(() => {
     let currentTheme: ThemeType = 'light';
