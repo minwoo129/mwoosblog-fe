@@ -25,7 +25,7 @@ const BlogTitle = async ({
         <p>{dayjs(createdAt).format('YYYY년 MM월 DD일')}</p>
         <p>({tags.map((tag, i) => `${i ? ', ' : ''}${tag}`)})</p>
       </div>
-      <hr className="mt-0" />
+      <hr className="mt-[8px]" />
       <div className="mx-auto aspect-video">
         <Image
           src={src}
@@ -37,6 +37,7 @@ const BlogTitle = async ({
           className="size-full"
         />
       </div>
+      <div className="h-[40px]" />
     </header>
   );
 };
