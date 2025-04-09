@@ -3,7 +3,7 @@ import '../../../app/css/commonComponents.css';
 import Link from 'next/link';
 
 interface LogoProps {
-  type: 'linked' | 'basic';
+  type: 'linked' | 'basic' | 'watermark';
 }
 
 const Logo = ({type}: LogoProps) => {
@@ -11,6 +11,13 @@ const Logo = ({type}: LogoProps) => {
     return (
       <div className="basicLogo">
         <h1 className="logoTxt">{"MWoo's Blog"}</h1>
+      </div>
+    );
+  }
+  if (type === 'watermark') {
+    return (
+      <div className="basicLogo">
+        <h1 className="watermarkLogoTxt">{"MWoo's Blog"}</h1>
       </div>
     );
   }

@@ -15,4 +15,8 @@
   .logoTxt {
     @apply text-[24px];
   }
+
+  .watermarkLogoTxt {
+    @apply text-[24px] text-white;
+  }
 }

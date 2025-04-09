@@ -5,6 +5,7 @@ import {Card} from 'antd';
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import {ClockCircleOutlined} from '@ant-design/icons';
+import ThumbnailImg from './ThumbnailImg';
 
 const {Meta} = Card;
 
@@ -16,11 +17,13 @@ const PostItem = ({post}: PostItemProps) => {
   const {title, createdAt, thumbnailImg, slug} = post;
 
   return (
-    <Link href={`/blog/${slug}`}>
+    <Link
+      href={`/blog/${slug}`}
+      className=" transition ease-in-out duration-300 hover:scale-105">
       <Card
         hoverable
-        className="w-[300px] transition ease-in-out duration-300 hover:scale-105"
-        cover={<img alt="example" src={thumbnailImg} />}>
+        className="w-[300px]"
+        cover={<ThumbnailImg thumbnailImg={thumbnailImg} />}>
         <Meta
           title={title}
           description={

@@ -12,11 +12,11 @@ export async function getPosts(): Promise<Post[]> {
   const posts = await Promise.all(
     slugs.map(async ({name}) => {
       const {metadata} = await import(`../app/blog/(posts)/${name}/page.mdx`);
-      return {slug: name, ...metadata};
+      return {slug: name, ...metadata} as Post;
     })
   );
 
-  posts.sort((a, b) => +new Date(b.publishDate) - +new Date(a.publishDate));
+  posts.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
 
-  return posts;
+  return posts.filter(post => post.category !== 'test');
 }
