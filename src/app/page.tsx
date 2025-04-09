@@ -1,11 +1,24 @@
+import PostList from '@/components/screens/main/PostList';
 import usePosts from '@/hooks/usePosts';
 
 const Home = async () => {
   const {fetchPosts} = usePosts();
   const posts = await fetchPosts();
+  const testPosts = [
+    ...posts,
+    ...posts,
+    ...posts,
+    ...posts,
+    ...posts,
+    ...posts,
+    ...posts,
+    ...posts,
+    ...posts,
+    ...posts,
+  ];
   return (
-    <div className="min-w-[400px] flex flex-col items-center sm:px-[20px] md:px-[20px]">
-      <h1 className="text-[100px]">테스트</h1>
+    <div className="flex flex-col h-fit items-center sm:px-[20px] md:px-[20px] border-2 border-red-500">
+      <PostList posts={testPosts} />
 
       {/* <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
         <Image
