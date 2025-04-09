@@ -5,10 +5,9 @@ const usePosts = () => {
   const fetchPosts = useCallback(async () => {
     try {
       const result = await getPosts();
-      console.log('Fetched posts:', result);
       return result;
-    } catch (e) {
-      console.log('Error fetching posts:', e);
+      // eslint-disable-next-line no-unused-vars
+    } catch (_) {
       return [];
     }
   }, []);
