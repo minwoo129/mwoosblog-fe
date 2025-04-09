@@ -1,17 +1,14 @@
+/* eslint-disable no-empty-pattern */
 import Link from 'next/link';
-import {ComponentProps} from 'react';
-
-interface NavBtnProps extends Omit<ComponentProps<typeof Link>, 'children'> {
-  children: string;
-}
+import {GithubOutlined} from '@ant-design/icons';
+import '../../../app/css/navigation.css';
 
 const Navigation = ({}) => {
   return (
-    <div className="w-full flex flex-row justify-between items-center px-4 py-2 drop-shadow-2xl sticky">
+    <div className="navigation">
       <Logo />
-      <div className="flex flex-row gap-4">
-        {/* <NavBtn href="/">Home</NavBtn> */}
-        {/* <NavBtn href="/">About</NavBtn> */}
+      <div className="navRightGrid">
+        <GithubBtn />
       </div>
     </div>
   );
@@ -20,19 +17,17 @@ const Navigation = ({}) => {
 const Logo = ({}) => {
   return (
     <Link href="/">
-      <div className="w-fit h-fit p-2 rounded-md transition ease-in-out duration-300 hover:text-orange-500 font-bold">
-        <h1 className=" text-[20px] font-">{"MWoo's Blog"}</h1>
+      <div className="logo">
+        <h1 className="logoTxt">{"MWoo's Blog"}</h1>
       </div>
     </Link>
   );
 };
 
-const NavBtn = ({href, children, ...props}: NavBtnProps) => {
+const GithubBtn = ({}) => {
   return (
-    <Link href={href} {...props}>
-      <div className="w-fit h-fit p-2  rounded-md transition ease-in-out duration-300 hover:text-orange-500">
-        {children}
-      </div>
+    <Link href={'https://github.com/minwoo129'} target="_blank">
+      <GithubOutlined style={{fontSize: 32}} />
     </Link>
   );
 };

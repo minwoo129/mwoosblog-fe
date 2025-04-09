@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .navigation {
+    @apply w-full flex flex-row justify-between items-center px-4 py-2 drop-shadow-2xl sticky;
+    @apply border-b-2 border-gray-300;
+  }
+
+  .navRightGrid {
+    @apply flex flex-row gap-4;
+  }
+
+  .logo {
+    @apply w-fit h-fit p-2 rounded-md transition ease-in-out duration-300 hover:text-yellow-500 font-bold;
+  }
+
+  .logoTxt {
+    @apply text-[24px];
+  }
+}
