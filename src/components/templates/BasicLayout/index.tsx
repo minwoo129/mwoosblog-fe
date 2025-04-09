@@ -8,7 +8,7 @@ const BasicLayout = ({children}: {children: ReactNode}) => {
       <Navigation />
 
       {/* <ThemeToggleBtn /> */}
-      <div className=" w-full min-h-full overflow-auto overflow-y-scroll">
+      <div className=" flex-1 w-full overflow-auto overflow-y-scroll ">
         {children}
       </div>
     </div>

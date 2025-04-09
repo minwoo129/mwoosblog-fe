@@ -17,7 +17,7 @@ const Home = async () => {
     ...posts,
   ];
   return (
-    <div className="flex flex-col h-fit items-center sm:px-[20px] md:px-[20px] border-2 border-red-500">
+    <div className="flex flex-col h-fit items-center sm:px-[20px] md:px-[20px]">
       <PostList posts={testPosts} />
 
       {/* <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
