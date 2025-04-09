@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .prose h1 {
+    @apply text-white;
+  }
+  .prose h2 {
+    @apply text-white;
+  }
+  .prose p {
+    @apply text-white;
+    @apply mt-[4px] mb-0;
+  }
+  .prose ul {
+    @apply mt-[4px] mb-0;
+  }
+  .prose li {
+    @apply my-[2px];
+    @apply text-white;
+  }
+  .prose a {
+    @apply transition ease-in-out duration-300;
+    @apply text-white hover:text-yellow-500;
+  }
+
+  /* code title */
+  .prose .rehype-code-title {
+    @apply text-yellow-500;
+  }
+}

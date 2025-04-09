@@ -1,3 +1,4 @@
+/* eslint-disable no-empty-pattern */
 'use client';
 import useThemeToggleBtn from './hooks/useThemeToggleBtn';
 import LightModeBtnComponent from './components/LightModeBtnComponent';

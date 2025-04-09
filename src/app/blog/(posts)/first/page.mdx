@@ -1,0 +1,53 @@
+export const metadata = {
+  title: '첫번째 블로그',
+  description: 'Hello World Page',
+  category: 'test',
+  createdAt: '2025-04-08T14:00:00+09:00',
+  thumbnailImg:
+    'https://velog.velcdn.com/images/minwoo129/post/47760cb3-6a36-4822-aa20-28f982d5bed2/image.png',
+  tags: ['test', 'blog', 'react'],
+};
+
+<BlogTitle {...metadata} />
+
+# Welcome to my MDX page!
+
+This is some **bold** and _italics_ text.
+
+This is a list in markdown:
+
+- One
+- Two
+- Three
+
+## code test
+
+```tsx:TestTitle showLineNumbers
+import React from 'react';
+import '@css/App.css';
+import {Button, Calendar} from '@admin/ui';
+
+const Main = () => {
+  return (
+    <div>
+      <h1>Main</h1>
+      <Button color="primary" />
+      <Calendar
+        onSelect={(date, selectInfo) => {}}
+        onPanelChange={(date, mode) => {}}
+        cellRender={}
+      />
+    </div>
+  );
+};
+
+export default Main;
+```
+
+<aside>aside test</aside>
+
+## link test
+
+[test](https://naver.com)
+
+Checkout my React component:
