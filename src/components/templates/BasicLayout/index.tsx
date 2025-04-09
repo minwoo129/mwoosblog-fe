@@ -1,5 +1,6 @@
 import {ReactNode} from 'react';
 import Navigation from './Navigation';
+import Footer from '../Footer';
 //import ThemeToggleBtn from '../../atoms/ThemeToggleBtn';
 
 const BasicLayout = ({children}: {children: ReactNode}) => {
@@ -8,8 +9,9 @@ const BasicLayout = ({children}: {children: ReactNode}) => {
       <Navigation />
 
       {/* <ThemeToggleBtn /> */}
-      <div className=" flex-1 w-full overflow-auto overflow-y-scroll ">
-        {children}
+      <div className=" flex-1 w-full overflow-auto overflow-y-scroll">
+        <div className="w-full min-h-full">{children}</div>
+        <Footer />
       </div>
     </div>
   );

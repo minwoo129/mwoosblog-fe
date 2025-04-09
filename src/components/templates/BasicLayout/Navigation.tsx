@@ -2,25 +2,16 @@
 import Link from 'next/link';
 import {GithubOutlined} from '@ant-design/icons';
 import '../../../app/css/navigation.css';
+import Logo from '@/components/common/Logo';
 
 const Navigation = ({}) => {
   return (
     <div className="navigation">
-      <Logo />
+      <Logo type="linked" />
       <div className="navRightGrid">
         <GithubBtn />
       </div>
     </div>
-  );
-};
-
-const Logo = ({}) => {
-  return (
-    <Link href="/">
-      <div className="logo">
-        <h1 className="logoTxt">{"MWoo's Blog"}</h1>
-      </div>
-    </Link>
   );
 };
 
