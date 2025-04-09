@@ -5,6 +5,7 @@ import {ThemeProvider} from 'next-themes';
 import BasicLayout from '@/components/templates/BasicLayout';
 import 'dayjs/locale/ko';
 import dayjs from 'dayjs';
+import {AntdRegistry} from '@ant-design/nextjs-registry';
 
 dayjs.locale('ko');
 
@@ -21,9 +22,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body>
-        <ThemeProvider>
-          <BasicLayout>{children}</BasicLayout>
-        </ThemeProvider>
+        <AntdRegistry>
+          <ThemeProvider>
+            <BasicLayout>{children}</BasicLayout>
+          </ThemeProvider>
+        </AntdRegistry>
       </body>
     </html>
   );

@@ -17,10 +17,12 @@ const PostItem = ({post}: PostItemProps) => {
   const {title, createdAt, thumbnailImg, slug} = post;
 
   return (
-    <Link href={`/blog/${slug}`}>
+    <Link
+      href={`/blog/${slug}`}
+      className=" transition ease-in-out duration-300 hover:scale-105">
       <Card
         hoverable
-        className="w-[300px] transition ease-in-out duration-300 hover:scale-105"
+        className="w-[300px]"
         cover={<ThumbnailImg thumbnailImg={thumbnailImg} />}>
         <Meta
           title={title}
