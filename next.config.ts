@@ -21,6 +21,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'velog.velcdn.com',
       },
+      {
+        protocol: 'https',
+        hostname: process.env.NEXT_PUBLIC_NAVER_CDN_DOMAIN,
+      },
     ],
   },
 };
