@@ -23,7 +23,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: process.env.NEXT_PUBLIC_NAVER_CDN_DOMAIN,
+        hostname: 'edqtpvyrloqd28014065.gcdn.ntruss.com',
       },
     ],
   },
