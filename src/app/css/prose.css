@@ -31,4 +31,8 @@
   .prose .rehype-code-title {
     @apply text-yellow-500;
   }
+
+  .prose strong {
+    @apply text-yellow-500 font-bold;
+  }
 }
