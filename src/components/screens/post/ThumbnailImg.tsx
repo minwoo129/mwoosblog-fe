@@ -9,11 +9,7 @@ interface ThumbnailImgProps {
 
 const ThumbnailImg = async ({title, thumbnailImg}: ThumbnailImgProps) => {
   if (!thumbnailImg) {
-    return (
-      <div className="mx-auto aspect-video">
-        <div className="aspect-video flex justify-center items-center bg-gray-500" />
-      </div>
-    );
+    return null;
   }
   const {src, width, height, placeholder} =
     await getPlaceholderImage(thumbnailImg);
