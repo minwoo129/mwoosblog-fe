@@ -10,7 +10,13 @@ const ThumbnailImg = ({thumbnailImg}: ThumbnailImgProps) => {
       <div className="aspect-video flex justify-center items-center bg-gray-500" />
     );
   }
-  return <img alt="thumbnail" className="aspect-video" src={thumbnailImg} />;
+  return (
+    <img
+      alt="thumbnail"
+      className="aspect-video object-cover"
+      src={thumbnailImg}
+    />
+  );
 };
 
 export default ThumbnailImg;

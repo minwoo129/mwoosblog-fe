@@ -6,4 +6,5 @@ export interface Post {
   createdAt: string;
   thumbnailImg: string;
   tags: string[];
+  visible: boolean;
 }

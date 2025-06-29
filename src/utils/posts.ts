@@ -18,5 +18,8 @@ export async function getPosts(): Promise<Post[]> {
 
   posts.sort((a, b) => +new Date(b.createdAt) - +new Date(a.createdAt));
 
-  return posts.filter(post => post.category !== 'test');
+  if (process.env.NODE_ENV !== 'production') {
+    return posts;
+  }
+  return posts.filter(post => post.visible);
 }
