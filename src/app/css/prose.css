@@ -11,6 +11,14 @@
     @apply text-white;
     @apply mt-[40px];
   }
+  .prose h3 {
+    @apply text-white;
+    @apply mt-[40px];
+  }
+  .prose h4 {
+    @apply text-white;
+    @apply mt-[40px];
+  }
   .prose p {
     @apply text-white;
     @apply mt-[4px] mb-0;
