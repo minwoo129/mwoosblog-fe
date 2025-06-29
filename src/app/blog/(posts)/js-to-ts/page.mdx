@@ -1,0 +1,153 @@
+export const metadata = {
+  title: '왜 우리는 JavaScript와의 이별을 준비해야 하는가?',
+  description: '',
+  category: '',
+  createdAt: '2023-01-29T07:09:48.838Z',
+  thumbnailImg:
+    'https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/js-to-ts/image01.jpg',
+  tags: ['JavaScript', 'React', 'react native', 'typescript', 'vue'],
+};
+
+<BlogTitle {...metadata} />
+
+안녕하세요. 이번 포스트는 저를 포함해서 많은 프론트엔드 또는 node.js 백엔드 개발자 등 javascript를 주로 다루시는 개발자분들께서 많이들 공감하실 수 있는 주제를 정리해보았습니다. 이번에는 javascript를 다루는 개발자들이 왜 javascript와의 이별을 고해야야 하는지와 이에 대한 제 생각을 정리해보았습니다.
+
+# JavaScript
+
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/js-to-ts/image02.png)
+
+JavaScript란 마크업 언어인 HTML이 데이터에 따라 동적으로 표현되도록 도와주는 프로그래밍 언어입니다. 엄밀히 말하면 [스크립트 언어](https://namu.wiki/w/%EC%8A%A4%ED%81%AC%EB%A6%BD%ED%8A%B8%20%EC%96%B8%EC%96%B4)에 속하죠.
+
+많이들 아실수도 있지만, JavaScript는 1995년 넷스케이프에서 근무하던 [브랜든 아이크](https://namu.wiki/w/%EB%B8%8C%EB%9E%9C%EB%93%A0%20%EC%95%84%EC%9D%B4%ED%81%AC)에 의해 개발됬으며, 몇년도 아니고 **단 10일만에** JavaScript를 개발해낸 것으로 유명합니다. 아마도 아두이노와 같은 아주 소규모 프로젝트에서만 사용할 목적으로 JavaScript를 개발해냈을 것으로 생각을 하는데요, 아마 개발자 아이크도 JavaScript가 전세계 모든 웹사이트에 없어서는 안되는 언어로 발전하게 될 줄은 꿈에도 몰랐을 것이라 생각합니다.
+아마 이렇게 될줄 알았으면 몇년에 걸쳐서 좀더 성능적으로 잘 다듬어서 세상에 내놨을 테니까요.
+
+## JavaScript의 장점
+
+일단 JavaScript의 장점을 몇가지 뽑아보자면, JavaScript는 HTML과 CSS를 통합할 수 있다는 것과, 운영체제의 제한을 받지 않고 거의 모든 브라우저에서 사용할 수 있다는 것입니다. 다만 브라우저마다 JavaScript를 돌리기 위해 사용하는 엔진이 다를 뿐이죠. 저희가 많이 사용하는 브라우저인 크롬과 네이버 웨일의 경우 V8이라는 엔진을 사용하고, FireFox에서는 SpiderMonkey라는 엔진을 사용하고 있을 뿐 JavaScript를 사용할 수 있는 것은 똑같습니다.
+
+## JavaScript의 단점
+
+다음으로 이번 포스트에서 주로 다룰 JavaScript의 단점을 짚어보자면, JavaScript는 파이썬과 같은 인터프리터 언어이기 때문에 빠르지만, 자료형을 철저하게 분석하지 않는다는 것입니다. 또 하나로 JavaScript는 너무 높은 유연성을 제공한다는 것입니다.
+
+우리가 다음과 같은 코드를 작성한다고 가정해보겠습니다.
+
+```javascript
+[1, 2, 3, 4] + true;
+```
+
+보통의 프로그래밍 언어들은 다음과 같은 연산을 절대로 허용하지 않습니다. 하지만 JavaScript는 이를 허용합니다.
+
+이 코드의 결과값을 확인해보면 다음과 같이 출력될 것입니다.
+
+```javascript
+[1, 2, 3, 4] + true;
+// 출력값: '1,2,3,4true'
+```
+
+또 하나의 예시를 들면 다음과 같은 함수가 있다고 가정해보겠습니다.
+
+```javascript
+function divide(a, b) {
+  return a / b;
+}
+```
+
+나눗셈 함수입니다. 그럼 이 함수에 다음과 같은 값을 넣어서 결과값을 확인해보겠습니다
+
+```javascript
+divide(2, 3);
+// 출력값: 0.6666666666666666
+```
+
+우리가 의도하던 대로 정상적인 나눗셈 결과가 출력되는 것을 확인하였습니다.
+
+하지만 다음과 같이 함수를 돌리려고 하면
+
+```javascript
+divide('xxxxxx');
+```
+
+보통의 언어들은 이러한 함수 실행을 절대로 허용하지 않을 것입니다. 함수의 인수를 2개를 추가하도록 정의했는데 하나밖에 적용하지 않았으니까요.
+
+그럼 여기서 이 코드를 돌려볼까요?
+
+```javascript
+divide('xxxxxx');
+// 출력값: NaN
+```
+
+역시나 오류가 발생되지 않고 무언가 결과값이 도출됬습니다.
+
+원래는 일치하지 않는 자료형간의 연산과 일치하지 않는 함수의 인수와 자료형을 통해 연산을 하려고 하면 다른 언어들은 절대로 이를 허용하지 않지만, JavaScript는 이를 어떻게든 돌려보기 위해서 노력합니다. 이러한 문제들이 어떤 부분에서는 JavaScript의 장점이 될수도 있지만, 치명적인 문제점이 될수도 있습니다. 어떤 경우에 따라서 값이 정상적으로 도출될 수도 있지만, 그렇지 못하는 경우 JavaScript는 계속해서 이를 다시 돌려서 결과값을 도출해내기 위해 노력할 것이고 그 임계점을 넘어버리게 되면 JavaScript를 다루는 개발자들이 절대로 보고싶어하지 않은 "**런타임 에러**"가 발생하게 됩니다.
+
+## 런타임 에러
+
+런타임 에러는 개발 중에 발생하는 것이 아닌 실제 사용자들이 사용하고 있는 과정에서 발생하는 에러이기 때문에 한번 발생하게 된다면 엄청난 치명타를 입히게 됩니다. 제가 지금 React-Native 개발자로 일하고 있기 때문에 React-Native를 예시로 설명하면, React-Native로 개발한 앱에서 이러한 런타임 에러가 발생하게 된다면 이로 인해 앱에 강제종료 등과 같은 정말 치명적인 오류가 발생하는 것입니다.
+
+이러한 강제종료를 막아내기 위해서 개발자들은 수많은 테스트 과정을 통해 이에 대응하고 있는데요, React-Native와 같은 JavaScript가 사용되는 프레임워크의 경우 JavaScript의 이와 같은 문제 때문에 대응하기 어렵습니다. 개발자도 사람이기 때문에 이러한 실수들을 하기 마련입니다. 하지만 JavaScript가 이러한 실수를 언어차원에서 보호해주지 못하기 때문에 이런 문제가 더 두드러지게 되는 것입니다.
+
+그럼 이러한 문제를 막아내려면 어떻게 해야할까요?
+
+개발자들이 개발하는 과정에서 프로그래밍 언어가 위와 같은 문제들을 잡아주고, 자료형이 서로 일치하지 않으면 경고를 통해 개발자에게 알려준다면 이에 대한 경우의 수에 대응할 수 있는 코드를 작성하게 되어 정말 편하지 않을까요?
+
+바로 이러한 문제들로 인해 JavaScript의 대안이 될 수 있는 언어, **TypeScript**가 등장하게 됩니다.
+
+# TypeScript
+
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/js-to-ts/image03.png)
+TypeScript는 마이크로소프트에서 2012년 발표한 JavaScript 기반의 정적타입 프로그래밍 언어입니다. 그리고 아까 말씀드린 것처럼 JavaScript가 **인터프리터 언어**인 것과 달리, TypeScript는 **컴파일 언어**이기 때문에 코드 실행 시 C, Java 처럼 컴파일 과정을 거치게 됩니다.
+
+TypeScript는 보기에는 JavaScript와 비슷하게 생겼지만, 차이점은 TypeScript는 특정 변수나 함수의 인수의 타입을 알려주는 구문이 존재한다는 것입니다.
+
+아까 위에서 설명한 나눗셈 함수를 예시를 들면 JavaScript에서는 위 함수를 다음과 같이 정의했습니다.
+
+```javascript
+function divide(a, b) {
+  return a / b;
+}
+```
+
+하지만 TypeScript에서는 다음과 같이 정의해야 합니다.
+
+```typescript
+function divide(a: number, b: number) {
+  return a / b;
+}
+```
+
+인수 선언 부분을 잘보면, JavaScript와 같이 인수의 자료형, 즉 타입이 number로 정의되어 있습니다. 이를 통해 a와 b가 number 타입이어야 한다는 것을 명확히 하고 있습니다. TypeScript playground에서 위와 동일한 예시를 들어보면
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/js-to-ts/image04.png)
+number 타입인 2와 3이 들어간 경우에는 아무 문제가 없지만, 문자열이 들어간 경우 빨간 줄이 쳐지게 되죠? 이 경우 TypeScript는 이 코드를 절대로 실행하지 않습니다. 이것이 바로 TypeScript의 특징입니다.
+
+이를 통해 TypeScript는 개발자가 코드를 작성하면서 발생할 수 있는 변수의 타입 에러를 막아주면서 타입 에러로 인해 발생할 수 있는 런타임 에러를 사전에 예방할 수 있게 해줍니다. 즉, **타입 안정성**이 보장되는 것이죠. 이러한 타입 안정성은 개발자가 코드를 작성하면서 타입의 오류가 확인될 경우 경고를 발생시키고, 경고가 그대로 남아있으면 컴파일을 진행하지 않습니다.
+
+타입 안정성이 보장되는 특징에 의한 장점은 하나 더 있는데요, 만약 VSCode에서 TypeScript를 사용한다면, 객체 내부에 어떤 데이터가 존재하는 지와 그 데이터가 어떤 타입인지를 **자동완성 기능**을 통해 제공하기 때문에 생산성이 올라가는 효과가 있다는 것입니다.
+
+이게 제가 사이드 프로젝트로 진행했던 프로젝트의 모습인데요,
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/js-to-ts/image05.png)
+보니까 어떠세요? 정말 편할 것 같지 않나요 ㅎㅎㅎ
+
+## TypeScript 컴파일
+
+하지만, 현재 전세계 모든 웹사이트의 경우 JavaScript만 실행할 수 있기 때문에 TypeScript를 바로 돌릴 수 없습니다. 하지만 걱정 안 하셔도 됩니다. 그래서 개발자가 코드 작성을 완료하면 TypeScript로 작성한 코드를 컴파일러를 통해 JavaScript로 컴파일하는 과정을 거치게 되니까요.
+
+TypeScript 코드가 JavaScript로 컴파일됬을 때 어떻게 변환되는지는 [TypeScript 공식 홈페이지](https://www.typescriptlang.org/)에 있는 Playground를 통해 확인이 가능하니 직접 코드를 작성해서 확인해보세요!!!
+
+# 이 글을 마치며...
+
+위에서 살짝 얘기한 것 처럼, 저는 지금 React-Native를 사용해 모바일 앱을 개발하고 있는 개발자입니다. TypeScript를 알게 된 후 저는 제가 참여하고 있는 프로젝트에서 새로 추가하는 컴포넌트 파일의 경우 전부 TypeScript로 작성하고 있고, 기존에 존재하고 있었던 컴포넌트 파일은 리팩토링을 통해 TypeScript로 변환하는 작업을 하면서 점점 JavaScript와 이별을 고하고 있습니다. TypeScript를 통해 실수도 덜하고 JavaScript를 사용할 때보다 더 생산적으로 개발하는 것 같은 느낌을 몸으로 느끼고 있기 때문입니다.
+
+특히 원티드를 보면, 제가 하고있는 React-Native와 React, Vue 개발자의 경우 TypeScript를 사용할 줄 아는 개발자와 사전 면접과제 진행 시 TypeScript로 개발한 사람에게는 추가 점수를 제공하는 식으로 우대조건을 걸 만큼 TypeScript의 인기가 높아지고 있으니, JavaScript에 익숙하신 개발자시라면, TypeScript를 사용해보시는 것이 좋을 것 같습니다.
+
+하지만, 이제 막 개발자가 되신 분에게는 바로 TypeScript를 사용하지 마시고 **한 6개월 정도 JavaScript를 사용해 보신 다음** TypeScript로 넘어오시는 것을 권해드립니다. 그 이유는 TypeScript는 JavaScript에 기반해 개발된 언어이기 때문에, **JavaScript에 관한 기본적인 지식과 이해가 있어야 이해하기 쉽기 때문입니다.** 그렇기 때문에 이제 막 개발자가 된 주니어 개발자이시고 아직 JavaScript에 익숙하지 않다면, 일단 **JavaScript에 익숙해지는 시간을 거친 이후에 TypeScript로 넘어오시는 것을 권장합니다.** 아까 코드에서 보셨듯, JavaScript 파일을 TypeScript로 변경하는 것은 매우 쉽기 때문에 이 방법이 훨씬 낫습니다.
+(이미 JavaScript에 익숙하시다면 바로 TypeScript를 써도 상관 없습니다.)
+
+포스트를 잘 봐주셨다면, 좋아요 한번만 부탁드릴게요!!!! 만약 틀린 부분이 있다면 댓글을 통해 알려주시면 확인 후 수정하겠습니다. 근거가 될 만한 링크나 자료를 함께 남겨주신다면 큰 도움이 됩니다!!!
+
+감사합니다!!!!
+
+# 참고자료
+
+- [활용도가 높아지는 웹 프론트엔드 언어, 타입스크립트(TypeScript)](https://www.samsungsds.com/kr/insights/typescript.html)
+- [모던 JavaScript 튜토리얼](https://ko.javascript.info/)
+- [노마드 코더 - 타입스크립트로 블록체인 만들기](https://nomadcoders.co/typescript-for-beginners)
