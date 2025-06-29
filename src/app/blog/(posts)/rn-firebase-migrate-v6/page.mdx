@@ -53,23 +53,23 @@ yarn remove react-native-firebase
 yarn add @react-native-firebase/app @react-native-firebase/{설치하고자 하는 서비스 모듈} ...
 ```
 
-> **Firebase 서비스 별 모듈 이름**
-> AdMob: @react-native-firebase/admob
-> Analytics: @react-native-firebase/analytics
-> App Invites: @react-native-firebase/invites
-> Authentication: @react-native-firebase/authentication
-> Cloud Firestore: @react-native-firebase/firestore
-> Cloud Functions: @react-native-firebase/functions
-> Cloud Messaging: @react-native-firebase/messaging
-> Cloud Storage: @react-native-firebase/storage
-> Crashlytics: @react-native-firebase/crashlytics
-> Dynamic Links: @react-native-firebase/dynamic-links
-> In-app Messaging: @react-native-firebase/in-app-messaging
-> Instance ID: @react-native-firebase/iid
-> ML: @react-native-firebase/ml
-> Performance Monitoring: @react-native-firebase/perf
-> Realtime Database: @react-native-firebase/database
-> Remote Config: @react-native-firebase/remote-config
+> **Firebase 서비스 별 모듈 이름**  
+> **AdMob**: @react-native-firebase/admob  
+> **Analytics**: @react-native-firebase/analytics  
+> **App Invites**: @react-native-firebase/invites  
+> **Authentication**: @react-native-firebase/authentication  
+> **Cloud Firestore**: @react-native-firebase/firestore  
+> **Cloud Functions**: @react-native-firebase/functions  
+> **Cloud Messaging**: @react-native-firebase/messaging  
+> **Cloud Storage**: @react-native-firebase/storage  
+> **Crashlytics**: @react-native-firebase/crashlytics  
+> **Dynamic Links**: @react-native-firebase/dynamic-links  
+> **In-app Messaging**: @react-native-firebase/in-app-messaging  
+> **Instance ID**: @react-native-firebase/iid  
+> **ML**: @react-native-firebase/ml  
+> **Performance Monitoring**: @react-native-firebase/perf  
+> **Realtime Database**: @react-native-firebase/database  
+> **Remote Config**: @react-native-firebase/remote-config
 
 # 3. v5 설정내용 제거
 
@@ -206,9 +206,9 @@ pod 'FirebaseCoreInternal', :modular_headers => true
 pod 'GoogleUtilities', :modular_headers => true
 ```
 
-> **정정합니다**
-> react-native용 firebase 패키지는 설치한 버전에 따라 추가해줘야 하는 의존성 패키지가 다를 수 있음을 알려드립니다.
-> @react-native-firebase 패키지는 아무리 길어도 1,2주 안에 새 버전이 배포될 정도로 업데이트 주기가 매우 빠릅니다. 제가 이 문서를 작성할 당시 설치한 패키지 버전은 15.3.0이며, 현재 날짜(2023년 4월 12일)을 기준으로 17.4.2버전까지 배포된 상태입니다. 이에 따라 새 버전이 릴리즈되면서 기능향상을 위해 새로운 cocoapod 의존성 패키지가 추가되고 있어, 어떤 버전을 설치하시느냐에 따라 연결해야할 의존성 패키지가 다를 수 있습니다.
+> **정정합니다**  
+> react-native용 firebase 패키지는 설치한 버전에 따라 추가해줘야 하는 의존성 패키지가 다를 수 있음을 알려드립니다.  
+> @react-native-firebase 패키지는 아무리 길어도 1,2주 안에 새 버전이 배포될 정도로 업데이트 주기가 매우 빠릅니다. 제가 이 문서를 작성할 당시 설치한 패키지 버전은 15.3.0이며, 현재 날짜(2023년 4월 12일)을 기준으로 17.4.2버전까지 배포된 상태입니다. 이에 따라 새 버전이 릴리즈되면서 기능향상을 위해 새로운 cocoapod 의존성 패키지가 추가되고 있어, 어떤 버전을 설치하시느냐에 따라 연결해야할 의존성 패키지가 다를 수 있습니다.  
 > => 연결해야하는 의존성 패키지는 아래에 pod 재설치(pod install) 명령어 실행시 경고로 표시됩니다.
 
 => pod 재설치는 편의상 맨 마지막 단계에서 하는 것이 좋으니 나중에 설명하겠다.
@@ -649,7 +649,7 @@ Xcode에서 왼쪽 최상단의 앱 이름을 클릭하고 TARGETS -> \{앱 이�
 
 이때까지의 git 커밋 기록을 확인해보고, dynamic-links 설정과 관련된 모든 코드를 지워주면 된다.
 
-지워야 할 코드는 아래의 링크를 참조할 것!!
+지워야 할 코드는 아래의 링크를 참조할 것!!  
 [React Native에서 다이나믹 링크 사용하기](https://velog.io/@minwoo129/React-Native%EC%97%90%EC%84%9C-%EB%8B%A4%EC%9D%B4%EB%82%98%EB%AF%B9-%EB%A7%81%ED%81%AC-%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0#%EA%B8%B0%ED%83%80-%EC%BD%94%EB%93%9C-%EC%B6%94%EA%B0%80) => 내가 예전에 작성한 v5 버전 다이나믹 링크 설정 방법
 
 ### 3) 자바스크립트 코드 수정
@@ -690,8 +690,8 @@ dynamicLinks()
 
 그 다음으로 링크 생성 코드는 우리 프로젝트는 sha-256 인증키가 firebase에 등록이 안되있어서, rest api로 링크를 생성했기 때문에 따로 수정할 부분은 없었다. 만약 사전에 sha-256키를 firebase에 등록을 하고 firebase 모듈을 통해 링크를 생성했다면, [firebase 공식문서](https://rnfirebase.io/dynamic-links/usage#create-a-link)에 나와있는 대로 링크를 생성하도록 하면 크게 문제될 건 없을 것이다.
 
-> **추가 유의사항을 알려드립니다.**
-> 링크 생성을 위한 [API 요청 본문 형식](https://firebase.google.com/docs/reference/dynamic-links/link-shortener?authuser=0&hl=ko) 중 navigationInfo에 **enableForcedRedirect**라는 boolean 타입 속성이 있을 것입니다. 이 속성은 iOS에서 firebase에서 제공하는 앱 미리보기 웹페이지를 건너뛰고 바로 앱으로 리다이렉트되는 것을 활성화할지를 물어보는 속성입니다. 이 속성은 가급적 사용하지 마시거나, false로 정의해주시기 바랍니다. 이 속성을 true로 정의했을 때 iOS 16버전이 설치된 단말기에서 앱으로 리다이렉트는 되지만 getInitialLink 메서드의 결과값으로 null이 반환되는 문제가 확인되었습니다. (아무래도 앱으로 접속하는 중간에 링크가 유실되는 것으로 추정됩니다.)
+> **추가 유의사항을 알려드립니다.**  
+> 링크 생성을 위한 [API 요청 본문 형식](https://firebase.google.com/docs/reference/dynamic-links/link-shortener?authuser=0&hl=ko) 중 navigationInfo에 **enableForcedRedirect**라는 boolean 타입 속성이 있을 것입니다. 이 속성은 iOS에서 firebase에서 제공하는 앱 미리보기 웹페이지를 건너뛰고 바로 앱으로 리다이렉트되는 것을 활성화할지를 물어보는 속성입니다. 이 속성은 가급적 사용하지 마시거나, false로 정의해주시기 바랍니다. 이 속성을 true로 정의했을 때 iOS 16버전이 설치된 단말기에서 앱으로 리다이렉트는 되지만 getInitialLink 메서드의 결과값으로 null이 반환되는 문제가 확인되었습니다. (아무래도 앱으로 접속하는 중간에 링크가 유실되는 것으로 추정됩니다.)  
 > => 참고로 안드로이드 단말기의 경우 기본적으로 크롬 앱이 설치되어 있어 링크를 클릭하는 순간 크롬 브라우저 내부 기능이 실행되어 안정적인 앱 리다이렉트가 이루어지니 안심하고 사용하셔도 됩니다.
 
 ## 3. Analytics
@@ -751,9 +751,9 @@ Targeting S+ (version 31 and above) requires that an explicit value for android:
 이 문제는 따로 설치한 오픈소스 모듈에도 이 설정이 안되있으면 설치에 실패하기 때문에, 모듈의 버전이 오래됬으면 모듈의 버전을 업데이트 해주는 것이 좋다.
 
 > 문제가 된 오픈 소스 모듈 및 버전
-
-- 네이버 로그인 모듈
-  [@react-native-seoul/naver-login](https://github.com/react-native-seoul/react-native-naver-login): 버전 2.1.0 이하
+>
+> - 네이버 로그인 모듈  
+>   [@react-native-seoul/naver-login](https://github.com/react-native-seoul/react-native-naver-login): 버전 2.1.0 이하
 
 (지금은 네이버 로그인 모듈에서만 문제가 된걸 찾았지만, 다른 프로젝트를 진행하면서 문제가 된 모듈을 발견할 때마다 계속 업데이트하겠습니다.)
 

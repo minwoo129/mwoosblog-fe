@@ -83,6 +83,8 @@ Checks는 구글이 제공하는 AI 기반 개인정보 보호 플랫폼입니�
 Firebase에 대해서 어느정도 아시는 분은 잘 아시겠지만, Firebase에서 제공하는 Firestore, Realtime Database와 같은 데이터베이스는 NoSQL 기반 데이터베이스이기 때문에 비관계형 데이터베이스입니다. 하지만 간혹 개발을 할 때 MySQL과 같은 관계형 데이터베이스가 필요할 때도 있죠.
 이 Firebase Data Connect는 Google Cloud SQL에 추가된 postgreSQL을 Firebase를 통해 앱과 연결하는 새로운 서비스입니다!!
 
+##
+
 Data Connect는 개발자가 정의한 테이블 구조에 기반에 아래의 것들을 생성합니다.
 
 - Cloud SQL의 PostgreSQL DB
@@ -107,6 +109,8 @@ type Order @table {
 	name: String!
 }
 ```
+
+##
 
 이렇게 만약 테이블 구조가 추가되거나, 테이블 내부에 컬럼 명이 변경되는 경우, 만약 새로운 테이블을 생성해서 기존 테이블에 관계를 두어 연결하는 경우 Data Connect는 Cloud SQL 내 PostgreSQL에서 데이터베이스 마이그레이션을 진행합니다. 그리고 마이그레이션이 완료되면 구글 인프라에서 실행되는 API 서버의 업데이트가 이루어집니다. 그리고 마지막으로 모바일이나 웹에서 사용할 새로운 SDK를 생성하는 방법으로 작동합니다.
 
