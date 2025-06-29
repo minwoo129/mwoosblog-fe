@@ -21,6 +21,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'velog.velcdn.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'edqtpvyrloqd28014065.gcdn.ntruss.com',
+      },
     ],
   },
 };
