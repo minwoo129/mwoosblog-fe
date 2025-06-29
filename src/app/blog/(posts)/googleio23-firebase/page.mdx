@@ -1,0 +1,115 @@
+export const metadata = {
+  title: 'Firebase의 새소식 - 구글 io 2023',
+  description: '',
+  category: 'Google I/O',
+  createdAt: '2023-05-29T02:27:06.298Z',
+  thumbnailImg:
+    'https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/googleio23-firebase/image01.jpg',
+  tags: ['Firebase', '구글io'],
+  visible: true,
+};
+
+<BlogTitle {...metadata} />
+
+안녕하세요. 이번에는 1년만에 다시 돌아온 구글의 개발자 컨퍼런스 "구글io"에서 발표된 Firebase 새소식에 관한 내용을 정리하였습니다. 원래는 구글io 개막 후 일주일 이내에 강의를 수강하고 포스트를 올리려고 했으나 회사일이 갑자기 많아져서 늦어졌습니다. 그럼 이제 시작해보도록 하겠습니다.
+
+(본 포스트는 제가 구글io 강의를 수강하고 작성한 내용으로, 내용이 일부 잘못된 부분이 있을 수 있다는 점 양해 부탁드립니다.)
+
+# Firebase Cloud Functions
+
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/googleio23-firebase/image01.jpg)
+Firebase는 이번 구글io 2023을 통해 Firebase Extensions, Firestore, App Check 등 다양한 서비스에서의 새소식이 발표되었는데요, 올해는 Firebase Cloud Functions에 대한 업데이트가 부각된 강의였던 것 같습니다.
+올해 구글io에서는 Firebase Cloud Functions의 2세대 버전이 베타를 종료하고 공식 출시되었습니다. 인스턴스의 크기가 **기존 최대 16GB에서 32GB**까지 확장되어 워크로드 처리 능력이 향상된 것이 특징이라고 합니다.
+
+## 동시성
+
+이번에 정식 출시된 2세대 Cloud Functions에서는 동시성, 즉 **병렬 처리 기능**이 새롭게 추가되었다고 합니다. 이를 통해 하나의 Cloud Functions를 통해 최대 1000개의 요청을 병렬 처리할 수 있게 되었습니다. 이를 통해 갑작스럽게 요청건수가 증가하더라도 인스턴스의 부하를 조금 더 줄일 수 있고, 이와 동시에 앱의 속도도 빨라질 것입니다.
+
+## Firestore Trigger Support
+
+지난 4월, Firebase에서는 Cloud Functions 2세대의 일환으로 Firestore Trigger Support라는 기능을 미리보기로 출시하였다고 합니다. 이 기능을 통해서 Firestore 컬렉션에 데이터 쓰기 작업에 따라 함수가 트리거 되고 이러한 함수는 상당히 빠른 속도로 실행된다고 합니다.
+
+## Python 지원(미리보기)
+
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/googleio23-firebase/image02.jpg)
+사실 이 점이 Cloud Functions 2세대에서 가장 부각될 만한 부분인 것 같습니다. 이번 Cloud Functions 2세대에 **Python이 미리보기를 통해 지원되기 시작했습니다.** 이를 통해 Cloud Functions 함수 생성시 다양한 python 패키지와 python으로 작성된 오픈소스 솔루션을 사용할 수 있게 되었고 이를 사용한 머신러닝 등의 작업에 사용할 수 있게 되었다고 합니다.
+Cloud Functions에서 Python이 공식 지원됨에 따라 firestore, nodejs용 firebase admin SDK에서 지원되는 모든 트리거와 호환이 가능해졌습니다. 만약 HTTP 트리거를 사용하는 규모가 큰 API를 설계하는 경우, Firestore 이벤트에 응답받고 싶은 경우 모두 호환이 가능해졌습니다.
+
+# Firebase Extensions
+
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/googleio23-firebase/image03.jpg)
+이번에는 Firebase Extensions에 관한 내용입니다. Firebase Extensions는 미리 패키지된 서버리스 확장 프로그램으로 예를 들어 회원 탈퇴 요청 시 사용자를 잡아둘수 있는 홍보성(?) 이메일을 발송하거나, 이미지 프로세싱이 필요할 때 유용합니다. 만약 앱에 새로운 기능을 개발했다면, 이를 테스트하고 빌드, 관리하는데에 많은 시간과 노력이 들어갑니다. 새로운 기능에서 어떤 사이드 이펙트가 나타날지 모르니까요? 하지만 Firebase Extensions에 미리 배포된 확장 프로그램이 있다면 이 프로그램이 이와 같은 문제를 해결해줄 것입니다.
+이 확장 프로그램들은 구글, 구글이 파트너사, Firebase 커뮤니티에 소속된 열정적인 개발자들이 참여하여 개발된 확장 프로그램들이기 때문에 안정성이 상당히 높다고 평가할 수 있고 무엇보다도 유지보수에 많은 시간과 노력을 들일 필요가 없어집니다.
+
+## PaLM API chatbot
+
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/googleio23-firebase/image04.jpg)
+이번 구글io 기조연설을 시청하셨다면 PaLM2에 대해서 들어보셨을겁니다. PaLM API는 Google AI에서 개발한 패러럴 압축 Transformer 언어 모델 API입니다. PaLM API를 사용하면 텍스트, 코드, 이미지, 음성, 비디오 등 다양한 데이터를 처리하고 분석할 수 있습니다. 이 PaLM API Chatbot 확장 프로그램을 사용하면 구글의 최신형 언어 API인 PaLM API를 Firestore 인스턴스에 연결할수 있게 됩니다. 따라서 별다른 설정 없이 생성형 AI 기능을 앱에 추가할 수 있게 되는 것이지요.
+
+## Build & Publish 기능(Beta)
+
+위에서 설명드렸다시피, Firebase Extensions는 구글과 구글의 검증된 파트너사, Firebase 커뮤니티에 소속된 열정적인 개발자들이 배포한 확장 프로그램들로 운영된다고 말씀드렸습니다. 하지만 이제는 Build & Publish 기능을 사용해 위 사람들이 아닌 누구나 Extensions용 확장 프로그램을 구축하여 배포할 수 있게 되었습니다. 이를 통해 개발자들은 자신들의 필요에 맞는 프로그램들을 개발하여 동료 또는 이를 필요로 하는 많은 사람들에게 배포할 수 있게 되었다고 합니다. 저는 이 기능이 가장 설레는 데요, 저도 한시라도 빨리 이를 배워서 많은 사람들에게 도움이 되는 확장 프로그램을 배포할 수 있었으면 좋겠습니다.
+
+# Firestore
+
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/googleio23-firebase/image05.jpg)
+이번 구글io에서는 Firestore에 관한 내용은 그렇게 많이 나오지는 않았지만 작년 구글io에서 베타로 공개된 기능의 정식 배포 소식을 설명해드릴 필요가 있을 거 같네요!! 사실 이 소식에 대해서 설명을 드리면 백엔드 개발자분들께서는 뭐 그리 특별한 기능일까하는 생각이 드실수 있습니다. 사실 저도 마찬가지였습니다.
+
+## Count 기능
+
+count 기능은 Firestore에서 특정 쿼리와 일치하는 문서의 갯수를 반환하거나, 매출 집계 등에 사용할 수 있는 쿼리 함수입니다. 이 기능이 작년도 구글 io를 통해 베타로 공개됬었는데, 해당 기능이 올해를 기해 정식으로 출시되었습니다.
+
+## OR 쿼리 정식 지원
+
+저도 이 부분은 이 강의를 수강하고 많이 놀랐습니다.
+
+"아니, 데이터베이슨데 OR 쿼리가 없었다고?????"
+
+사실 강의를 계속 수정해보니, Firestore 쿼리 중에서 in 연산자라고 해서 OR 쿼리를 대신하여 역할을 수행하는 연산자가 있었다고 합니다. 하지만 이보다 더 복잡한 쿼리를 수행하기 위한 용도로 OR 연산자가 공식 추가된 것으로 보입니다.
+
+# Firebase App Check
+
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/googleio23-firebase/image06.jpg)
+이번에는 제가 작년 구글io부터 관심을 가지기 시작했던 Firebase App Check에 관한 내용입니다. 작년 구글io에서 정식으로 출시된 이후 유의미한 기능이 새로 추가된 것 같아 정리하였습니다.
+
+참고로 모르시는 분이 있을 것 같아 간단하게 설명해드리겠습니다. Firebase App Check는 **백엔드와 클라이언트 간의 안전한 데이터 전송을 위한 서비스**로 승인되지 않은 클라이언트가 백엔드에 접속할 경우 API 사용을 차단할 수 있는 서비스입니다. 클라이언트에서 Firebase에서 발급받은 토큰과 백엔드에서 발급받은 자체 토큰을 REST API 요청 시 헤더에 적용합니다. 그리고 클라이언트에서 REST API 요청을 보낼 때 요청은 Firebase를 통과하고 백엔드에 접속하게 되는데, 유효하지 않은 토큰으로 확인될 경우 Firebase에서 그 요청을 튕겨내 백엔드로 요청이 전송되지 않도록 하는 원리입니다. 이 서비스는 Firebase에서 돌아가는 백엔드 뿐만 아니라 Spring, Nodejs 등 개발자가 자체적으로 구축한 백엔드에서도 사용 가능합니다.
+
+이제 본론으로 들어가보겠습니다.
+
+## 지원대상 추가: Firebase Authentication(인증)
+
+작년에 App Check가 정식 출시되었을 때 지원대상에는 Cloud Functions, Firestore, Cloud Storage, Realtime Database 등이었습니다. 이제는 Firebase Authentication(인증)도 App Check 지원대상에 추가되었습니다.
+
+## Unity, C++ 전용 공식 SDK 추가
+
+이 내용은 Unity와 C++를 사용하시는 게임 개발자이신 경우 주목하실 것 같습니다. 올해 구글io에서 Unity와 C++용 Firebase App Check SDK가 추가되었습니다. 이를 통해 게임에서 나올 수 없을 정도로 높은 점수가 나오거나, 자동 게이밍 등 다양한 부정행위 문제를 일정 부분 해소할 수 있을 것으로 기대됩니다.
+
+## Replay(리플레이) 공격 보호 기능 추가(Beta)
+
+이 내용은 게임 개발자를 포함하여 블록체인 개발자에게도 관심있는 내용이 아닐까 싶습니다. 사용자 로그인, 하드웨어 운영과 같은 보안에 민감한 작업을 하는 개발자는 Replay 공격도 문제가 될 수 있다고 합니다(저는 프론트 개발자라서 잘 모르겠습니다.)
+
+> **Replay 공격**  
+> Replay 공격이란 공격자가 보안 네트워크를 가로채고, 해당 통신의 수신자로 하여금 공격자가 원하는 작업을 수행하도록 하기위해 통신을 지연시키거나 재전송하는 방식의 공격 방식입니다. 이 공격은 해커가 네트워크에서 메세지를 가로챈 후 메세지를 복호화하기 위한 별도의 과정이 필요하지 않고, 메세지를 포함한 통신 전체를 다시 전송하는 것으로도 공격에 성공할 수 있습니다.  
+> => replay 공격에 대해서 자료 조사를 해본 결과, 특히 블록체인의 경우 동일한 트랜젝션이 두 번 발생되어 이중 지불문제로 이어질 수 있기 때문에 상당히 위험하다고 합니다.  
+> => 자료 참고: [velog: Blockchain - 리플레이 공격](https://velog.io/@bcdy19/Blockchain-%EB%A6%AC%ED%94%8C%EB%A0%88%EC%9D%B4Replay-%EA%B3%B5%EA%B2%A9)
+
+이번에 Firebase용 Cloud Functions에서 사용자 지정 백엔드에 대한 replay 공격 보호 기능을 지원하기 시작했습니다. 이 기능을 통해 민감한 엔드포인트를 replay 공격으로부터 보호할 수 있다고 합니다.
+
+# terraform 리소스 제공
+
+저도 이 부분을 처음 시작할 때 이게 무슨 내용인가 했는데, 계속 들어보니 나중에 새 프로젝트를 생성하면서 필요할 수 있겠다는 생각이 들어 정리하였습니다.
+사실 얼마전에 제가 회사에서 다른 백엔드 개발자분께 이 얘기를 들었습니다.
+
+"혹시 firebase 프로젝트도 운영, 개발, 스테이징 처럼 분리해야 되는거 아니에요?"
+
+Terraform은 HashiCorp에서 개발한 오픈 소스 코드형 인프라스트럭처로 클라우드 리소스의 프로비저닝 구조를 자동화할 수 있고 백엔드 리소스가 모든 환경에서 동일하게 유지되도록 할 수 있다고 합니다. 위에서 이야기한 것과 같이 프로덕션 환경이 개발, 스테이징, 그 이외에 모든 테스트 환경과도 일치하게 되는 것이죠.
+
+일단 제가 자료를 조사한 것은 여기까지지만, 올해 구글io 이후 Firebase 프로젝트, 앱, firebstore, 인증 등 주요 firebase 리소스에 대해 terraform 리소스를 지원하기 시작했다고 합니다. 이 부분에 대해서는 저도 조금 더 조사가 필요해서 오류가 있거나 새로 추가될 내용이 있는 경우 새로 추가하겠습니다.
+
+그 이외에 Firebase Hosting에서 Astro, SvelteKit, Nuxt와 같은 프레임워크의 지원 추가 소식이 발표되었고, Flutter 웹에서의 Firebase hosting 공식 지원 등의 기능이 발표되었습니다.
+
+##
+
+일단 제가 작성한 내용은 여기까지입니다. 저도 강의를 조금 더 시청하고 추가 내용이 있을 경우 이후에 추가하도록 하겠습니다.
+
+감사합니다.

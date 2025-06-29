@@ -1,0 +1,135 @@
+export const metadata = {
+  title: '안드로이드 개발 시 폴더블 디바이스 대응하기',
+  description: '',
+  category: 'Android',
+  createdAt: '2023-09-17T07:29:06.845Z',
+  thumbnailImg:
+    'https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/android-fold/image01.png',
+  tags: [
+    'Z폴드',
+    'android',
+    'fold',
+    'z플립',
+    '갤럭시',
+    '멀티 윈도우',
+    '앱 연속성',
+  ],
+  visible: true,
+};
+
+<BlogTitle {...metadata} />
+
+안녕하세요! 오랜만에 블로그로 인사드립니다. 오늘은 저를 포함한 모바일 개발자라면 공감할 수 있는 주제를 가지고 왔습니다. 바로 안드로이드 폴더블 디바이스에서의 빌드에 대응하는 방법과 간단하게 스타일을 적용하는 요령에 대해서 설명해보려고 합니다.
+
+참고로 이 포스트는 갤럭시Z폴드를 기준으로 작성하도록 하겠습니다. (Z플립의 경우 플립5 이전 단말기에서는 커버 디스플레이가 앱을 구동할 수 없을 정도로 작기 때문에 사실상 화면이 하나라고 칩니다.)
+
+# 1. 안드로이드 폴더블 관련 기본 개념 설명
+
+## 1-1. 앱 연속성
+
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/android-fold/image02.gif)
+이미지 출처: [https://creasy.tistory.com/2076](https://creasy.tistory.com/2076)
+
+앱 연속성이라는 개념은 2개 이상의 화면이 달려있는 폴더블 디바이스에서 접었다가 펼쳤다가 할 때마다 앱을 종료시키지 않고 연속해서 실행시킨다는 개념으로 안드로이드 10(API 레벨 29)에서 새로 추가됬습니다.
+갤럭시Z폴드 계열 폴더블 디바이스의 경우 화면이 두개입니다. 이 말은 이 두개의 디스플레이가 개별적으로 동작한다는 것이고, 이에 따라 앱도 이 두 화면에서 개별적으로 동작합니다. 이렇게 되면 메인 디스플레이에서 앱을 잘 쓰고 있다가 폰을 접으면 기존과 같이 앱이 실행되지 않고 처음부터 실행해야 합니다. 그러면 너무 불편하죠? 하지만 앱 연속성 개념을 사용하면 접었다가 펼쳤다가 할 때마다 앱이 종료되지 않고 연속해서 사용할 수 있게 됩니다.
+
+## 1-2. 멀티 윈도우
+
+사실 멀티 윈도우는 폴더블 단말기가 출시되기 전, 즉 안드로이드 10 이전 버전에서도 존재하던 개념이기 때문에 새로운 개념은 아닙니다. 한 화면에 앱을 여러개 띄운다는 개념인 거죠. 이거는 제가 예시 이미지로 보여드리겠습니다. 아마 일반 바형 안드로이드 단말기(특히 갤럭시 단말기)를 사용하시는 분이라면 이게 무슨 화면인지 충분히 이해하실 수 있습니다.
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/android-fold/image03.jpg)
+이제 감이 오시나요? 따라서 멀티윈도우는 단말기의 유형에 따라서 보여지는 모습이 다를 뿐 똑같은 기능이고, 폴드에 대한 최적화가 이루어진 안드로이드 10 이전 버전에서도 존재하던 개념입니다.
+
+## 1-3. 새로운 화면비
+
+기존 바형 단말기에서는 위의 사진과 같이 화면의 구조상 두개의 앱만 동시에 띄울 수 있었습니다. 하지만 폴드의 경우 기본적으로 7인치가 넘어가는 큰 화면이기 때문에 멀티윈도우로 두개 이상의 앱을 띄울 수 있는 충분한 공간이 확보됩니다. 이러한 이유로 인해 안드로이드에서도 앱 개발시 폴더블 디바이스에 적용할 수 있도록 다양한 화면비를 적용해 테스트할 것을 권장하고 있습니다. 안드로이드에서 예시로 제공하는 화면비는 다음과 같습니다.
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/android-fold/image04.png)
+이미지 출처: [Android Developer - 폴더블폰용 앱 빌드](https://developer.android.com/guide/topics/ui/foldables?hl=ko#%EC%83%88%EB%A1%9C%EC%9A%B4_%ED%99%94%EB%A9%B4%EB%B9%84)
+
+# 2. 앱 연속성 설정을 활성화하는 방법
+
+앱을 연속실행하도록 설정하는 방법은 매우 간단합니다. 안드로이드 프로젝트의 AndroidMenifiest.xml 파일로 접근해, application 태그에 **android:resizeableActivity="true"** 옵션을 추가해주면 앱을 두개의 화면에서 연속으로 실행할 수 있게 됩니다.
+
+```xml
+<application
+        ...
+        android:resizeableActivity="true"
+        >
+```
+
+여기서 정확히 말씀드리면, resizeableActivity 옵션은 안드로이드에서 다중창, 즉 멀티윈도우를 활성화하는 옵션이기 때문에 이 값을 true로 활성화하면 **멀티윈도우도 사용할 수 있게 됩니다.**
+
+## 앱 연속실행 설정 시 고려해야 할 점
+
+여기에서 앱 연속실행을 활성화하는 경우 고려해야 할 점이 있습니다. 바로 스타일 관련 이슈사항입니다.
+
+### 1) 가로 정렬시 절대값 사용 지양
+
+아까 제가 말씀드렸듯이 앱의 연속실행이 활성화된다는 것은 멀티윈도우도 함께 활성화된다는 것입니다. 하지만 폴드의 경우 멀티 윈도우를 사용하게 되면 세로 높이 뿐만 아니라 가로 높이도 함께 변할 수 있습니다. 따라서 개발 후 테스트 시 **UI가 깨지거나 겹쳐지는 문제가 분명히 발생하게 됩니다.** 이에 따라 요소들을 가로로 정렬하는 경우 **절대값을 사용해서 Margin을 적용하는 것을 지양하시는 것이 바람직**합니다. 이 대신 CSS에서 space-between, space-around와 비슷한 옵션들을 사용해서 화면 너비에 따라 자동으로 정렬되도록 하는 것이 가장 좋습니다.
+
+### 2) 화면 내 UI요소의 최적의 크기를 찾아라
+
+이 문제는 제 경험상, **스마트폰 화면의 크기가 너무 다양하기 때문에** 만약 멀티윈도우로 앱을 실행할 경우 UI가 겹쳐지거나 깨지는 문제를 완벽하게 해결하는 것은 **사실상 불가능**합니다. 따라서 앱 내부 UI 요소의 크기를 결정할 때는 디자이너와의 적극적인 협의를 통해 최적의 요소 크기를 찾는다면, 겹치는 문제를 완전히 막을 수는 없겠지만 UI가 깨지는 것을 최소화할 수는 있을 겁니다.
+
+### 3) 액티비티는 무조건 ScrollView로 처리할 것
+
+아까 멀티윈도우로 앱을 실행할 경우 앱의 가로, 세로 길이가 마음대로 조절할 수 있다고 했습니다. 이 때문에 UI 요소들이 아래로 떨어지는 경우에 대비하기 위해 액티비티 화면은 반드시 ScrollView로 처리하셔야 합니다. 그래야 멀티윈도우가 아니더라도 다양한 화면 크기에서도 문제없이 요소들을 보여줄 수 있습니다.
+
+# 3. 앱 연속성 설정을 비활성화하는 경우
+
+만약, 기획 담당자의 요구에 따라 앱 연속성 설정을 비활성화해야 하는 경우, 위에서 설명한 바와 같이, resizeableActivity 옵션을 false로 설정하면 앱 연속성 설정과 멀티 윈도우를 통한 실행이 비활성화됩니다.
+
+그리고 이 옵션은 거의 사용하실 일이 없긴 하겠지만, 단말기를 펼쳤을 때 단말기 전체화면에 앱이 띄워지는 것이 아닌, 화면 좌우가 잘려서 출력하도록 설정하는 방법도 있습니다. 이는 거의 사용하실 일이 없으리라 생각하지만, 폴드에 UI를 최적화할 시간이 없는 상황인 경우 사용하실 수 있으리라 생각합니다.
+
+이 경우 다음과 같이 작성하시면 됩니다.
+
+```xml
+<application
+      ...
+      android:resizeableActivity="false"
+      android:minAspectRatio="1.8"
+      >
+```
+
+minAspectRatio는 단말기 디스플레이에서 최소로 띄워줘야 하는 앱 화면의 비율입니다. 이 값은 소수로 작성하셔야 합니다. 참고로 이 값은 원하시는 세로비율을 가로비율로 나눈 값을 소수 2자리 수까지로 정의해주시면 됩니다.
+
+예를 들면
+제가 위에서 정의한 것 처럼 가로, 세로를 5:9로 맞추고자 하신다면 1.8, 3:4로 맞추신다면 1.33, 5:6으로 맞추신다면 1.2로 선언하시면 됩니다.
+=> 일반 바형 단말기에서는 잘리는 거 없이 정상적으로 작동할 겁니다.
+
+만약, minAspectRatio를 선언해주지 않으면 폴더블폰에서는 꽉찬 화면으로 출력될 겁니다.
+
+# 4. JetPack WindowManager
+
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/android-fold/image05.png)
+이미지 출처: [Android Developers Blog - Jetpack WindowManager 1.1 is stable!](https://android-developers.googleblog.com/2023/08/jetpack-windowmanager-11-is-stable.html)
+이는 Android 네이티브 개발자분들께 유용할 것 같아 소개해보고자 합니다. Jetpack WindowManager는 새로운 기기 폼팩터와 멀티 윈도우 환경을 쉽게 사용할 수 있도록 지원하는 라이브러리입니다. 현재는 폴더블 디바이스에서만 지원이 이루어지고 있지만, WindowManager를 사용하게 되면 한 화면에 두개 이상의 액티비티를 동시에 띄워 앱 내 다중 화면 기능을 사용할 수 있고, 폴더블 디바이스의 경우 얼마나 접혀졌는지 폴딩 각도를 가져올 수 있습니다.
+
+혹시 폴드를 쓰시는 분이라면 카톡이 다음과 같이 나타나는 것을 보셨을 겁니다.
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/android-fold/image06.jpg)
+이미지 출처: [연합뉴스 - 삼성 갤폴드3도 태블릿처럼…카톡 채팅목록·대화창 한번에 본다](https://www.yna.co.kr/view/AKR20210907143100017)
+이렇게 한 앱에서 두개 이상의 화면을 동시에 띄워주고 싶으면 WindowManager를 사용하시면 됩니다.
+
+안타깝게도, 이는 안드로이드 네이티브에서만 모든 기능을 사용할 수 있으며, 특히 React Native의 경우 React에서 제공하는 스레드 개수가 모자라기 때문에 이런 방식의 앱 개발은 불가능합니다.(제가 시도해봤습니다)
+
+# 5. 예상치못한 새로운 변수: 갤럭시Z플립5
+
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/android-fold/image07.jpeg)
+이미지 출처: [Youtube 동영상 - \[갤럭시 Z 플립5 \] Join the 멋 | 삼성전자](https://youtu.be/RGLrL2M5MOs?si=T73rnEp50721A4w9)
+
+여기에서 폴더블폰용 안드로이드 앱 빌드와 관련해서 저희가 변수로 고려해야할 단말기가 하나 더 늘어 이 내용도 포스트에 담고자 합니다. 바로 올해(2023년) 출시된 삼성의 갤럭시Z플립5 입니다.
+
+제가 이때까지의 플립 시리즈의 커버 이미지를 그림으로 보여드리겠습니다.(그림에서 주황색 영역이 디스플레이, 연두색 영역이 카메라입니다.)
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/android-fold/image08.jpeg)
+제가 그림으로 올려드렸듯이, 플립5에서는 기존 세대와는 달리 커버 디스플레이가 커버를 거의 덮어버릴 정도로 커진 상태입니다. 그리고 이로 인한 변수는 (아직 실험실 모드로만 제공하긴 하지만) 폴드처럼 **커버 디스플레이에서도 앱을 정상적으로 실행할 수 있다는 것입니다.** 이 내용은 제가 즐겨보는 Youtube 잇섭 채널의 [플립5 리뷰 영상](https://youtu.be/u3GQuMK5IHk?si=EEKhtEDXjMCjaxPJ)과 제가 삼성 스토어에 방문 체험해 봄으로서 확인한 내용입니다.
+
+아직 확실하진 않지만, 폴드에서의 사례를 볼때 위에서 설명한 resizeableActivity를 true로 활성화하면 플립5의 커버 디스플레이에서도 정상적으로 실행할 수 있지 않을까라는 추측이 든 상태입니다. 만약 이 추측이 맞다면, 액티비티를 ScrollView 처리만 하는 수준으로 해결이 가능할테니 큰 문제가 없을 것으로 보입니다. 이는 제가 언제든지 플립5 테스트폰을 확보하는 대로 테스트 결과를 포스팅하도록 하겠습니다.
+
+# 6. 자료 출처
+
+- [구글 폴더블폰에도 맞게 안드로이드 OS를 지원할 예정 : Hello World!](https://creasy.tistory.com/2076)
+- [Android Developer : 폴더블폰용 앱 빌드](https://developer.android.com/guide/topics/ui/foldables?hl=ko)
+- [연합뉴스 - 삼성 갤폴드3도 태블릿처럼…카톡 채팅목록·대화창 한번에 본다](https://www.yna.co.kr/view/AKR20210907143100017)
+- [Android Developer : Jetpack WindowManager](https://developer.android.com/jetpack/androidx/releases/window?hl=ko)
+- [Youtube : 삼성전자 한국 공식 채널](https://www.youtube.com/@SamsungKorea)
+- [Android Developers Blog - Jetpack WindowManager 1.1 is stable!](https://android-developers.googleblog.com/2023/08/jetpack-windowmanager-11-is-stable.html)
+- [Youtube : 커버 스크린에서 이런 것까지 되나요?;; 갤럭시 Z 플립5 플렉스 윈도우 완벽 활용법 - ITSub잇섭](https://youtu.be/u3GQuMK5IHk?si=EEKhtEDXjMCjaxPJ)

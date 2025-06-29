@@ -4,7 +4,7 @@ import React from 'react';
 import {Card} from 'antd';
 import dayjs from 'dayjs';
 import Link from 'next/link';
-import {ClockCircleOutlined} from '@ant-design/icons';
+import {ClockCircleOutlined, LockOutlined} from '@ant-design/icons';
 import ThumbnailImg from './ThumbnailImg';
 
 const {Meta} = Card;
@@ -30,6 +30,9 @@ const PostItem = ({post}: PostItemProps) => {
             <div className="flex justify-start items-center">
               <ClockCircleOutlined style={{marginRight: 4}} />
               <p>{dayjs(createdAt).format('YYYY-MM-DD')}</p>
+              {!post.visible && (
+                <LockOutlined style={{marginLeft: 20, color: 'black'}} />
+              )}
             </div>
           }
         />
