@@ -1,0 +1,708 @@
+export const metadata = {
+  title: '타입스크립트로 Redux 구성하기',
+  description: '',
+  category: 'Redux',
+  createdAt: '2022-11-08T16:02:10.885Z',
+  thumbnailImg:
+    'https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/redux-typescript/image01.png',
+  tags: [],
+};
+
+<BlogTitle {...metadata} />
+
+이번에는 최근들어 react를 다시한번 상기시키자는 마음으로 내가 2년동안 보고있는 책, [리액트를 다루는 기술](http://www.yes24.com/Product/Goods/78233628)에 나와있는 프로젝트를 한번 만들어보면서 하고 있는 내용을 정리해보려고 합니다. 바로 타입스크립트로 Redux를 구성하는 방법입니다.
+사실 이 책에는 코드를 자바스크립트로 설계했고 타입스크립트로 작성되지는 않았습니다. 하지만 일을 하면서 새 파일을 생성하면 무조건 타입스크립트로 작성하게 되면서, 이를 응용해보고자 책에 나와있는 프로젝트를 그대로 만들어보되, 언어는 전부 타입스크립트로 작성하기로 하여 이 경험을 바탕으로 블로그를 작성하였습니다.
+
+# 1. Redux란?
+
+일단 타입스크립트로 Redux를 설계하기에 앞서 Redux에 대해 한번더 상기시키고 가겠습니다. Redux란 React와 React Native에서 가장 많이 사용되고 있는 **상태관리 라이브러리**입니다. 여기서 예를 들어 두개의 앱 화면이 있다고 합시다. A페이지에서 B페이지로 이동했다가 다시 A페이지로 돌아온다면 처음 A 페이지 안에 들어있는 변수가 온전하게 보관되지 않을 가능성이 큽니다. 하지만 Redux는 React의 전역에서 각 화면에서 필요한 상태값을 분리시켜 관리하기 때문에 다른 페이지를 이동하는 과정에서 데이터 손실이 일어날 가능성이 없고 훨신 효율적으로 데이터를 관리할 수 있습니다.
+물론 전역에서 상태값을 관리할 수 있는 방법이 Redux만 있는 건 아닙니다. [Context API](https://react.vlpt.us/basic/22-context-dispatch.html)를 사용하여 상태값을 지정하고 children에서 호출하게 하는 방법도 있지만, 프로젝트의 규모가 커지게 되어 상당히 많은 상태값을 선언해야 할 경우 Redux를 사용하는 것이 좋습니다.
+
+Redux에 대해 설명하게 되면 이 5가지 개념에 대해 알아야 합니다.
+
+## 1-1. 액션(Action)
+
+상태에 어떤 변화가 필요한 때에 액션이라는 것이 발생하게 됩니다. 액션은 항상 객체 형식으로 선언되어야 하고 다음과 같은 형식의 구조를 띄게 됩니다.
+
+```javascript
+{
+	type: 'ACTION_TYPE',
+    data: { ... }
+}
+```
+
+액션 객체는 type이라는 명칭의 필드가 반드시 선언되어야 합니다. 이는 곧 액션 객체의 이름과 같은 역할을 하게 됩니다. 그리고 data에는 액션을 통해 상태가 변화해야 할 때 참고해야 할 데이터가 되며, 꼭 필드의 이름이 data가 되어야 할 필요는 없습니다. 각자가 편한 이름으로 필드를 선언하면 됩니다.
+
+## 1-2. 액션 생성 함수(Action Creator)
+
+액션 생성 함수, 즉 Action Creator는 액션 객체를 생성하는 역할을 하는 함수입니다. 어떤 변화를 일으켜야 할 때마다 액션 객체가 생성되어야 하는데, 매번 액션 객체를 직접 작성하면서 발생할 수 있는 번거로움과 데이터 누락 문제를 방지하기 위해 함수로 묶어서 관리하게 됩니다.
+
+```javascript
+const creator = value => {
+  return {type: 'ACTION_TYPE', payload: value};
+};
+```
+
+## 1-3. 리듀서(Reducer)
+
+리듀서는 액션 객체를 통해 받은 데이터를 통해 변화를 일으키는 함수입니다. 액션이 발생되면 리듀서가 현재상태와 전달받은 액션 객체를 파라미터로 받아오면, 두 값을 참고하여 새로운 상태를 만들어내는 것입니다.
+
+```javascript
+const initialState = {
+  count: 0,
+};
+
+function reducer(state = initialState, action) {
+  switch (action.type) {
+    case INCREMENT:
+      return {
+        ...state,
+        count: state.count + 1,
+      };
+    case DECREMENT:
+      return {
+        ...state,
+        count: state.count - 1,
+      };
+  }
+}
+```
+
+## 1-4. 스토어(Store)
+
+스토어(Store)란 프로젝트에 Redux를 적용하기 위해 생성해야 하는 것입니다. 참고로 Redux를 설계할 때는 단일 Store가 원칙이기 때문에 한 개의 프로젝트는 단 하나의 Store만 가질 수 있습니다.
+
+## 1-5. 디스패치(Dispatch)
+
+디스패치(Dispatch)란 Store의 내장 함수 중 하나로서, '액션을 발생시키는 것'이라고 이해하면 됩니다. 이 함수가 호출되면 Store는 Reducer 함수를 실행시켜 새로운 상태를 만들어 내게 됩니다.
+
+# 2. 타입스크립트로 Redux 설계해보기
+
+좋습니다. 그럼 지금부터 타입스크립트로 Redux를 설계해보겠습니다. 지금부터 설명하는 모든 내용은 React(React Native 아님) 프로젝트를 기준으로 설명하겠습니다. 또한 그 어떤 페이지도 연결하지 않고 오로지 Redux만 설계해보도록 하겠습니다.
+그리고 미들웨어를 사용한 비동기 통신 연결에 관한 내용은 사정상 작성하지 못하였으니 양해 부탁드립니다.
+
+## 2-1. 프로젝트 생성
+
+우선 프로젝트를 생성해봐야 겠죠? React 프로젝트를 한번 생성해보도록 하겠습니다.
+
+원하는 디렉토리로 이동하여 React 프로젝트 실행 명령어를 실행합니다.
+
+```
+yarn create react-app {프로젝트 명}
+```
+
+위의 명령어를 실행하게 되면 기본적으로 자바스크립트만 사용할 수 있게 프로젝트가 생성되기 때문에 추가적인 설정이 필요합니다. 하지만 아래의 명령어를 입력하면
+
+```
+yarn create react-app {프로젝트 명} --template typescript
+```
+
+처음 React 프로젝트를 생성할 때부터 타입스크립트가 적용됩니다.
+
+만일 첫번째 명령어를 통해 프로젝트를 생성했다면 다음 2-2로 넘어가고, 두번째 명령어를 통해 프로젝트를 생성했다면 바로 2-3으로 넘어갑니다.
+
+> **부연설명**
+> 개인 프로젝트의 경우 처음부터 끝까지 타입스크립트로 프로젝트를 구성해보고 싶다면 그렇게 하면 되지만, 만약에 회사에서 진행하는 프로젝트인 경우 타입스크립트만 쓰겠다고 약속한 경우면 모르지만 혹시나 나중에 자바스크립트를 사용해야 할 때가 있을수도 있으므로 첫번째 명령어를 통해 프로젝트를 생성하고 별도로 타입스크립트 설정을 적용해주는 것을 권장합니다.
+
+## 2-2. 타입스크립트 설정
+
+React 프로젝트에서 타입스크립트 설정에 기본적으로 필요한 모듈들을 설치해줍니다.
+
+```
+yarn add @types/react typescript @types/react-dom @types/node @types/jest
+```
+
+그리고 프로젝트 루트에 tsconfig.json 이라는 파일을 하나 생성하고 다음 코드를 적용합니다.
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx"
+  },
+  "include": ["src"]
+}
+```
+
+=> 이 설정값은 예시이므로, 필요한 상황에 맞춰 설정값을 변경해주면 됩니다.
+
+## 2-3. Redux 패키지 설치
+
+이 부분에서는 자바스크립트에서도 필요한 기본적인 Redux 패키지 외에 타입스크립트용 패키지가 따로 있기 때문에 이를 같이 설치해줍니다.
+
+```
+yarn add redux react-redux redux-logger @types/redux @types/react-redux @types/redux-logger typesafe-actions
+```
+
+## 2-4. 폴더 구조 구성
+
+React 프로젝트의 경우 src 디렉토리 내부에 있는 파일들만 기본적으로 인식합니다. 따라서 src 디렉토리 안에 modules라는 디렉토리를 만들고 그 안에 actions, actionTypes, initialStates, reducer 라는 이름의 4개의 디렉토리를 생성합니다. actions 안에는 Action Creator와 그 타입, actionTypes 안에는 액션을 생성하는 타입, initialStates 안에는 Redux 안에서 각 영역별 기본 상태값과 그 타입, reducer에는 각 영역별 Reducer와 그 것들을 하나로 묶어주는 Root Reducer(루트 리듀서)를 생성하도록 하겠습니다.
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/redux-typescript/image02.png)
+
+## 2-5. 상태값 정의
+
+modules안에 initialStates 안에 initialState.ts와 initialStateType.ts라는 파일을 생성해보겠습니다. 그리고 reducer 영역은 hello라는 이름으로만 만들어보겠습니다.
+
+우선 initialStateType.ts에 다음과 같이 hello라는 redux에 적용될 초기 상태값의 타입을 선언합니다.
+
+```typescript
+export type HelloStateType = {
+  count: number;
+};
+```
+
+참고로 타입을 선언할 때 type으로 선언할 지 interface로 선언할 지는 각자 기호에 맞춰서 선언하시면 됩니다. 다른 타입과 상속 구조로 생성하고 싶을 때는 interface로 생성하시면 됩니다.
+
+본론으로 넘어와서, initialState.ts 에 다음과 같이 초기 상태값을 선언해줍니다.
+
+```typescript
+import {HelloStateType} from './initialStateType';
+
+export const HelloState: HelloStateType = {
+  count: 0,
+};
+```
+
+## 2-6. 액션 타입 선언
+
+modules 안에 actionTypes 디렉토리에서 hello.ts라는 파일을 하나 추가해줍니다. 그리고 그 안에서 원하는 액션타입을 하나 추가해줍니다. 액션 타입은 ADD_COUNT, DEC_COUNT 두개로 만들어보겠습니다.
+
+```typescript
+export const ADD_COUNT = 'hello/ADD_COUNT';
+export const DEC_COUNT = 'hello/DEC_COUNT';
+```
+
+참고로 Redux에서 액션 타입을 선언할 때는, value가 String으로 되도록 하고, 위와 같이 '영역이름/변수이름 그대로'와 같은 형식으로 선언하는 것이 일반적입니다.
+
+## 2-7. 액션 생성 함수(Action Creator) 추가
+
+modules 안에 actions 디렉토리 안에 hello.ts라는 파일을 하나 생성하고, 다음과 같이 액션 생성 함수를 추가합니다.
+
+```typescript
+import {ADD_COUNT, DEC_COUNT} from '../actionTypes/hello';
+
+export const addCount = (value: number) => {
+  return {type: ADD_COUNT, payload: value};
+};
+
+export const decCount = (value: number) => {
+  return {type: DEC_COUNT, payload: value};
+};
+```
+
+그리고 동일한 디렉토리 안에 index.ts라는 파일을 하나 추가해줍니다. 이는 각 영역별 액션 생성함수들의 반환 타입을 지정해주게 됩니다. 이게 필요한 이유는 잠시 후에 설명하겠습니다.
+
+```typescript
+import {ActionType} from 'typesafe-actions';
+import {addCount, decCount} from './hello';
+
+export type HelloActionType =
+  | ActionType<typeof addCount>
+  | ActionType<typeof decCount>;
+```
+
+이와 같이 각 영역별 액션생성 함수들의 타입을 OR 연산자로 묶어 관리하도록 하겠습니다.
+
+## 2-8. 리듀서(Reducer) 추가
+
+지금부터 Reducer를 적용해보겠습니다. 기존에 Reducer를 사용해본 적 있으신 분들은 Reducer를 선언할 때 리팩토링 차원에서 redux-actions라는 패키지의 handleAction이라는 함수를 사용한 적이 있을 겁니다. 하지만 Redux가 타입스크립트로 설계될 때는 handleAction 함수를 사용하는 것이 오히려 불편하기 때문에 typesafe-actions 패키지에 내장되어 있는 createReducer라는 함수를 사용해보겠습니다.
+
+modules 안에 reducer 디렉토리 안에 hello.ts라는 파일을 추가하고 다음과 같이 Reducer 코드를 적용해줍니다.
+
+```typescript
+import {ADD_COUNT, DEC_COUNT} from '../actionTypes/hello';
+
+export default createReducer<HelloStateType, HelloActionType>(initialState, {
+  [ADD_COUNT]: (state, action) => {
+    const newState: HelloStateType = {
+      ...state,
+      count: state.count + action.payload,
+    };
+
+    return newState;
+  },
+  [DEC_COUNT]: (state, action) => {
+    const newState: HelloStateType = {
+      ...state,
+      count: state.count - action.payload,
+    };
+
+    return newState;
+  },
+});
+```
+
+위에서 영역별로 Action Creator의 타입을 묶어서 선언한다고 했었죠? 그 이유가 바로 이 때문입니다. createReducer의 타입 인자에 첫 번째 인자로는 상태값을 타입, 두 번째 인자로는 Action Creator의 타입을 선언해줘야 하기 때문입니다.
+
+## 2-9. 루트 리듀서(Root Reducer) 생성
+
+modules 안에 reducer 디렉토리 안에 index.ts 라는 파일을 하나 추가해줍니다. 그 안에 루트 리듀서를 선언해줄 것입니다. 그리고 그 루트 리듀서 파일 안에 루트 리듀서의 반환 타입을 선언해줄 것입니다.
+
+```typescript
+import {combineReducers} from 'redux';
+import hello from './hello';
+
+const rootReducer = combineReducers({
+  hello,
+});
+
+export type RootState = ReturnType<typeof rootReducer>;
+
+export default rootReducer;
+```
+
+## 2-10. Store 구성하기
+
+이제 거의 다 왔습니다. 이제 Store를 구성하고 프로젝트에 Redux를 적용하면 끝납니다.
+
+프로젝트의 src 디렉토리 안에 store라는 디렉토리를 하나 추가해주세요. 그리고 그 안에 configure.ts 라는 파일을 하나 추가해주고 다음과 같이 적용합니다.
+
+```typescript
+import {applyMiddleware, createStore} from 'redux';
+import {createLogger} from 'redux-logger';
+import reducer from '../modules/reducer';
+
+const configure = () => {
+  return createStore(reducer, applyMiddleware(createLogger()));
+};
+
+export default configure;
+```
+
+참고로 미들웨어는 logger만 적용하였습니다.
+
+그 다음 동일 디렉토리 안에 index.ts 라는 파일을 추가해 다음과 같이 코드를 적용합니다.
+
+```typescript
+import configure from './configure';
+export default configure();
+```
+
+## 2-11. Redux 연결
+
+이제 프로젝트의 index.tsx(또는 index.jsx) 파일에 provider 태그를 감싸주고 그 태그에 조금 전 만든 store를 적용하면 됩니다.
+
+```typescript
+import { Provider } from 'react-redux';
+import store from './store';
+...
+
+root.render(
+  <Provider store={store}>
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  </Provider>
+);
+
+...
+```
+
+# 3. 적용 테스트
+
+이제 이 Redux가 정상 작동하는지 테스트를 해보겠습니다. 프로젝트 내에 App.tsx라는 파일이 있으면 다음과 같이 수정해주세요.
+
+```typescript
+import React, { useState, ChangeEvent, MouseEvent } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "./modules/reducer";
+
+const App = () => {
+  const count = useSelector((state: RootState) => state.hello.count);
+
+  const [txt, setTxt] = useState<string>("");
+
+  const onChangeTxt = (e: ChangeEvent<HTMLInputElement>) => {
+    setTxt(e.target.value);
+  };
+
+  const onClickAdd = (e: MouseEvent<HTMLButtonElement>) => {
+    console.log("txt: ", txt);
+  };
+
+  const onClickDec = (e: MouseEvent<HTMLButtonElement>) => {
+    console.log("txt: ", txt);
+  };
+
+  return (
+    <div className="App">
+      <input value={txt} type={"number"} onChange={onChangeTxt} />
+      <button onClick={onClickAdd}>덧셈</button>
+      <button onClick={onClickDec}>뺄셈</button>
+
+      <div>{count}</div>
+    </div>
+  );
+};
+
+export default App;
+
+```
+
+이렇게 코드를 적용하고 프로젝트를 실행(yarn start)하면 다음과 같은 화면이 나타날 겁니다.
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/redux-typescript/image03.png)
+
+참고로 코드에 대해 설명을 드리면 useSelector 훅으로 감싼 count 보이시나요? 그 안에서 예전에 자바스크립트로 정의된 Redux 데이터를 타입스크립트 파일에서 선언해본 적이 있으시면 state의 타입을 RootStateOrAny라는 타입으로 선언하셨을 수 있습니다. 하지만 이번에는 Redux까지 타입스크립트로 선언되면서 Root Reducer를 구성하는 단계에서 Root Reducer의 반환타입을 추가로 구현해주면서 이를 호출하게 되면 redux의 상태값 구조의 타입을 호출할 수 있습니다.
+
+그럼 크롬 디버거를 켜고 input에 123이라고 입력한 다음 덧셈버튼을 눌러볼까요?
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/redux-typescript/image04.png)
+이렇게 입력값이 잘 입력되는 것을 확인해보았습니다.
+
+그럼 이제 Redux를 사용하여 입력된 값만큼 덧셈과 뺄셈을 구현해보겠습니다.
+코드를 다음과 같이 수정해주세요.
+
+```typescript
+import React, { useState, ChangeEvent, MouseEvent } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { addCount, decCount } from "./modules/actions/hello";
+import { RootState } from "./modules/reducer";
+
+const App = () => {
+  const dispatch = useDispatch();
+  const count = useSelector((state: RootState) => state.hello.count);
+
+  const [txt, setTxt] = useState<string>("");
+
+  const onChangeTxt = (e: ChangeEvent<HTMLInputElement>) => {
+    setTxt(e.target.value);
+  };
+
+  const onClickAdd = (e: MouseEvent<HTMLButtonElement>) => {
+    dispatch(addCount(Number(txt)));
+    setTxt("");
+  };
+
+  const onClickDec = (e: MouseEvent<HTMLButtonElement>) => {
+    dispatch(decCount(Number(txt)));
+    setTxt("");
+  };
+
+  return (
+    <div className="App">
+      <input value={txt} type={"number"} onChange={onChangeTxt} />
+      <button onClick={onClickAdd}>덧셈</button>
+      <button onClick={onClickDec}>뺄셈</button>
+
+      <div>{count}</div>
+    </div>
+  );
+};
+
+export default App;
+
+```
+
+그럼 입력창에 123이라고 입력하고 "덧셈" 버튼을 누르면,
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/redux-typescript/image05.png)
+잘 작동하고 redux logger를 통해 상태값이 잘 변화된 걸 확인하였습니다.
+
+그리고 반대로 입력창에 30을 입력하고 "뺄셈" 버튼을 누르면,
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/redux-typescript/image06.png)
+역시나 잘 작동하고 redux logger를 통해 상태값이 잘 변화된 걸 확인하였습니다.
+
+# 4. 미들웨어 연결하기
+
+Redux를 연결했다면 Redux를 사용하는데 있어서 거의 빼놓을 수 없는 미들웨어를 연결해보도록 하겠습니다. 이번 설명에서는 가장 많이 사용하는 미들웨어 중 하나인 Thunk를 연결해보도록 하겠습니다. 또한 이번 예시에서는 GitHub 사용자 정보 요청 API를 함께 호출해보도록 하겠습니다.(다른 OPEN API는 인증키가 필요한 경우가 많아서....)
+
+## 4-1. 패키지 설치하기
+
+미들웨어 패키지와 기타 패키지를 설치합니다.
+
+```
+yarn add redux-thunk @types/redux-thunk axios
+```
+
+## 4-2. API 응답데이터 타입 정의
+
+이번 연습에서 사용할 데이터의 반환 타입을 정의해야 합니다. 즉, GitHub 사용자 정보 요청 API의 데이터 구조와 그 반환값들의 타입을 정의하시면 됩니다. 대략적인 데이터 반환값은 제가 정리해두었으니 사용하시면 됩니다.(저도 여러 응답 데이터의 타입을 보고 정리를 했으나 정확하지 않을 수 있으니 양해 부탁드립니다.)
+
+```typescript
+export interface GithubProfile {
+  login: string;
+  id: number;
+  node_id: string;
+  avatar_url: string;
+  gravatar_id: string;
+  url: string;
+  html_url: string;
+  followers_url: string;
+  following_url: string;
+  gists_url: string;
+  starred_url: string;
+  subscriptions_url: string;
+  organizations_url: string;
+  repos_url: string;
+  events_url: string;
+  received_events_url: string;
+  type: string;
+  site_admin: boolean;
+  name: string;
+  company: string;
+  blog: string;
+  location: string | null;
+  email: string | null;
+  hireable: boolean | null;
+  bio: string | null;
+  public_repos: number;
+  public_gists: number;
+  followers: number;
+  following: number;
+  created_at: Date;
+  updated_at: Date;
+  twitter_username: string | null;
+}
+```
+
+이제 initialStateType.ts의 HelloStateType을 다음과 같이 수정하세요.
+
+```typescript
+export type HelloStateType = {
+  count: number;
+  // 추가
+  githubProfile: GithubProfile | null;
+};
+```
+
+그리고 initialState.ts의 helloState를 다음과 같이 수정하세요.
+
+```typescript
+export const HelloState: HelloStateType = {
+  count: 0,
+  githubProfile: null,
+};
+```
+
+## 4-3. 액션타입과 액션함수 정의
+
+비동기 액션의 경우에는 타입을 정의할 때 호출 액션과 요청이 성공했을 때, 실패했을 때의 타입을 함께 정의해야 합니다.
+
+actionTypes/hello.ts에 액션타입을 다음과 같이 정의한 다음
+
+```typescript
+export const GET_GITHUB_PROFILE = 'hello/GET_GITHUB_PROFILE';
+export const GET_GITHUB_PROFILE_SUCCESS = 'hello/GET_GITHUB_PROFILE_SUCCESS';
+export const GET_GITHUB_PROFILE_ERROR = 'hello/GET_GITHUB_PROFILE_ERROR';
+```
+
+actions/hello.ts에 다음과 같이 액션함수를 추가해주세요.
+
+```typescript
+import { createAsyncAction } from "typesafe-actions";
+import { AxiosError, AxiosResponse } from "axios";
+import {
+  ...
+  GET_GITHUB_PROFILE,
+  GET_GITHUB_PROFILE_ERROR,
+  GET_GITHUB_PROFILE_SUCCESS,
+} from "../actionTypes/hello";
+
+...
+export const getGithubProfile = createAsyncAction(
+  GET_GITHUB_PROFILE,
+  GET_GITHUB_PROFILE_SUCCESS,
+  GET_GITHUB_PROFILE_ERROR
+)<any, AxiosResponse<any, any>, AxiosError>();
+```
+
+그 다음, actions/index.ts에 HelloActionType을 다음과 같이 수정해주세요.
+
+```typescript
+import {ActionType} from 'typesafe-actions';
+import {addCount, decCount, getGithubProfile} from './hello';
+
+export type HelloActionType =
+  | ActionType<typeof addCount>
+  | ActionType<typeof decCount>
+  | ActionType<typeof getGithubProfile>;
+```
+
+## 4-4. Thunk 함수 만들기
+
+이제 여기서 부터 정말 중요하니 잘 집중해주세요!!
+modules 디렉토리 안에 thunk라는 디렉토리를 하나 추가합니다. 그리고 그 안에 index.ts라는 파일을 하나 추가해주세요. 그리고 다음과 같이 코드를 작성해주세요.
+
+```typescript
+import {Dispatch} from 'redux';
+import {AsyncActionCreatorBuilder} from 'typesafe-actions';
+
+type AnyAsyncActionCreator = AsyncActionCreatorBuilder<any, any, any>;
+export default function createAsyncThunk<
+  A extends AnyAsyncActionCreator,
+  F extends (...params: any[]) => Promise<any>,
+>(asyncActionCreator: A, promiseCreator: F) {
+  type Params = Parameters<F>;
+  return function thunk(...params: Params) {
+    return async (dispatch: Dispatch) => {
+      const {request, success, failure} = asyncActionCreator;
+      dispatch(request(undefined)); // 파라미터를 비우면 타입 에러가 나기 때문에 undefined 전달
+      try {
+        const result = await promiseCreator(...params);
+        dispatch(
+          success({
+            param: params[0],
+            result: result.data,
+          })
+        );
+        return result.data;
+      } catch (e) {
+        dispatch(failure(e));
+        throw e;
+      }
+    };
+  };
+}
+```
+
+그 다음, 같은 thunk 함수 안에 hello.ts라는 파일을 하나 생성해줍니다. 그리고 다음과 같이 코드를 작성해줍니다.
+
+```typescript
+import createAsyncThunk from '.';
+import {invokeAPI} from '../../restAPI';
+import {getGithubProfile} from '../actions/hello';
+
+export const getGithubProfileThunk = createAsyncThunk(
+  getGithubProfile,
+  invokeAPI({method: 'get', path: 'https://api.github.com/users'})
+);
+```
+
+위에서 설명한 일반 액션의 경우, actions/Hello.ts에 선언된 액션함수를 바로 호출하게 됩니다. 하지만 미들웨어를 사용한 비동기 액션의 경우 이 함수를 호출하게 됩니다. 미들웨어라는 개념이 기존에 디스패치해야 하는 액션을 중간에 가로채서 별도의 로직을 실행한 다음 새로운 액션을 디스패치하는 것이기 때문입니다.
+
+## 4-5. 리듀서 추가하기
+
+이제 이 액션의 리듀서를 추가해보도록 하겠습니다. reducer/hello.ts로 들어가서 다음과 같이 리듀서를 추가해줍니다.
+
+```typescript
+...
+import {
+  ...
+  GET_GITHUB_PROFILE,
+  GET_GITHUB_PROFILE_ERROR,
+  GET_GITHUB_PROFILE_SUCCESS,
+} from "../actionTypes/hello";
+
+export default createReducer<HelloStateType, HelloActionType>(initialState, {
+  ...
+  // GET_GITHUB_PROFILE =================================================================
+  [GET_GITHUB_PROFILE]: (state, action) => {
+    return state;
+  },
+  [GET_GITHUB_PROFILE_SUCCESS]: (state, { payload: { param, result } }) => {
+    let newState:HelloStateType = {
+      ...state,
+      githubProfile: result
+    }
+    return newState;
+  },
+  [GET_GITHUB_PROFILE_ERROR]: (state, action) => {
+    return state;
+  },
+});
+```
+
+## 4-6. 스토어 수정
+
+이제 마지막으로 스토어를 수정해야 합니다. 저희가 위에서 스토어를 작성할 때는 logger만 연결했는데, 이제 thunk 미들웨어가 새로 추가된 관계로 스토어 구성이 수정되어야 합니다.
+store/configure.ts 파일을 다음과 같이 수정해주세요.
+
+```typescript
+...
+// 아래 코드 두개만 추가하면 됩니다.
+import thunk from "redux-thunk";
+
+const configure = () => {
+  return createStore(reducer, applyMiddleware(createLogger(), thunk));
+};
+
+...
+
+```
+
+## 4-7. 테스트
+
+이제 미들웨어 연결을 위한 모든 과정이 끝났습니다. 그러면 이제 테스트를 해볼까요! 이제 App.tsx 파일을 다음과 같이 수정해주세요. 그대로 복붙하셔도 좋습니다. 여기서 \_getGithubProfile 함수 내 subPath에는 각자 GitHub 사용자 이름을 사용하시면 됩니다.
+
+```typescript
+import React, { useState, ChangeEvent, MouseEvent } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { addCount, decCount } from "./modules/actions/hello";
+import { RootState } from "./modules/reducer";
+import { getGithubProfileThunk } from "./modules/thunk/hello";
+
+const App = () => {
+  const dispatch = useDispatch<any>();
+  const count = useSelector((state: RootState) => state.hello.count);
+
+  const [txt, setTxt] = useState<string>("");
+
+  const onChangeTxt = (e: ChangeEvent<HTMLInputElement>) => {
+    setTxt(e.target.value);
+  };
+
+  const onClickAdd = (e: MouseEvent<HTMLButtonElement>) => {
+    dispatch(addCount(Number(txt)));
+    setTxt("");
+  };
+
+  const onClickDec = (e: MouseEvent<HTMLButtonElement>) => {
+    dispatch(decCount(Number(txt)));
+    setTxt("");
+  };
+
+  const _getGithubProfile = async (e: MouseEvent<HTMLButtonElement>) => {
+    try {
+      const result = await dispatch(
+        getGithubProfileThunk({
+          subPath: "/{github 사용자 이름}",
+        })
+      );
+    } catch (e: any) {
+      console.log("_getGithub error: ", e);
+    }
+  };
+
+  return (
+    <div className="App">
+      <div>
+        <input value={txt} type={"number"} onChange={onChangeTxt} />
+        <button onClick={onClickAdd}>덧셈</button>
+        <button onClick={onClickDec}>뺄셈</button>
+      </div>
+      <button onClick={_getGithubProfile}>github 계정 가져오기</button>
+
+      <div>{count}</div>
+    </div>
+  );
+};
+
+export default App;
+
+```
+
+어떤가요? 크롬 개발자모드에서 Success 액션이 호출되면 잘 연결된 것입니다.
+
+이 코드는 제 github 링크를 통해 공유를 하도록 하겠습니다. 제 코드를 참고하고 싶으시다면 참고하셔도 좋습니다!!!
+
+[https://github.com/minwoo129/react-redux-ts](https://github.com/minwoo129/react-redux-ts)
+
+이렇게 TypeScript에서의 Redux를 연결하는 방법과 미들웨어를 연결하는 방법까지 모두 정리하였습니다. 제 포스트에서 오류가 있다면 댓글을 통해 알려주시면 수정하도록 하겠습니다. 근거가 될만한 링크를 함께 올려주신다면 큰 도움이 됩니다!
+제 포스트가 유익하셨다면 좋아요 한번만 부탁드립니다!!
+감사합니다!!!
+
+# 참고자료
+
+- [TypeScript 에서 리덕스 프로처럼 사용하기 - 벨로퍼트와 함께하는 모던 리액트](https://react.vlpt.us/using-typescript/05-ts-redux.html)
+- [타입스크립트에서 리덕스 미들웨어 사용하기 (redux-thunk, redux-saga) - 벨로퍼트와 함께하는 모던 리액트](https://react.vlpt.us/using-typescript/06-ts-redux-middleware.html)
