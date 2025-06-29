@@ -1,0 +1,381 @@
+export const metadata = {
+  title: 'React Native에서 CodePush 사용하기!!!',
+  description: '',
+  category: 'React Native',
+  createdAt: '2022-05-14T07:43:06.842Z',
+  thumbnailImg:
+    'https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-codepush/image01.webp',
+  tags: ['android', 'codepush', 'iOS', 'react native', '설정방법'],
+};
+
+<BlogTitle {...metadata} />
+
+이미지 출처: [codepush로 react native 앱 심사없이 통과하기](https://dev.to/eatnug/codepush-react-native-4g84)
+
+> 알려드립니다.
+> 2024년 3월 16일 CodePush의 운영을 관리하는 App Center가 2025년 3월 31일자로 서비스를 종료한다고 발표하였습니다. => [공지원문](https://learn.microsoft.com/ko-kr/appcenter/retirement#alternative-solutions)
+> 지금 이 글을 작성하는 날짜(24년 4월 1일) 기준으로 발표가 난지 아직 보름정도 밖에 안됬기 때문에 CodePush 서비스가 다른 사업자로 이관이 된다는 건지 CodePush까지 완전히 서비스를 종료한다는 건지가 확인되지 않았습니다. 추가 공지가 올라오는 대로 별도의 포스트를 작성해 공유하도록 하겠습니다.
+
+모바일 앱을 개발하다보면 항상 고민하게 되는 것이 있을 것이다. 테스트도 다 마치고 심사까지 다 통과했는데 오타가 나오면 어떡하지? 그럴 때마다 오타를 수정해서 플레이스토어와 앱스토어에 재배포한다면 정말 이것만한 불편함은 없을 것이고, 문제는 그런 오류코드가 있는 앱을 최대 2주 이상 방치할 수 밖에 없다. 그러면, 오류가 발견됬을 때 그 오류를 수정하고 즉각적으로 이 수정내용을 사용자들이 설치한 앱에 반영하게 하는 방법은 없을까? 있다!
+그럼 이번에는 내 velog 두번째 게시글로 CodePush를 탐구하고 React Native에 이를 반영하는 방법을 소개하도록 하겠다.
+
+## CodePush
+
+CodePush는 마이크로소프트의 Visual Studio App Center에서 제공하는 서비스 중 하나로, 클라우드 기반의 앱 원격 업데이트 서비스이다.
+원리는 git과 유사하다. git은 코드를 수정하고 우리가 터미널을 통해 수정한 코드를 커밋하고 우리의 git 서버에 push하면 다른 개발자가 pull을 통해 내가 수정한 코드를 내려받을 수 있는 구조다. CodePush도 우리가 터미널에서 배포 명령을 실행하면 앱을 bundle 파일로 변환하고 이를 CodePush 클라우드 서버에 저장한다. 그럼 사용자가 기존에 설치한 앱을 실행하면 CodePush 서버에 업데이트 여부를 확인하고 수정된 내용을 병합하는 것이다.
+
+## Q & A
+
+1. 유료 서비스인가요?
+   -> CodePush는 무료 서비스이다. 원래 App Center에서 제공하는 일부 서비스 중에는 유료 서비스인 경우가 있으나, 단순 CodePush만 사용한다면 무료로 사용할 수 있다.
+2. 오픈소스 패키지에서 수정한 내용까지 배포할 수 있나요?
+   -> 그건 아니다. React Native 기준으로 자바스크립트 단에서 수정한 내용만 반영할 수 있고, 만약 수정과정에 자바스크립트 파일을 하나 추가하거나 삭제하는 경우 CodePush로 업데이트 할 수 없다.
+3. 업데이트 심사절차가 필요한가요?
+   -> 업데이트 심사가 없다. 다시 말하지만 CodePush는 클라우드를 기반으로 원격으로 앱을 업데이트하는 시스템이기 때문에 별도의 스토어 심사절차가 필요 없다. 따라서 단순 오타 또는 로직 오류인 경우 스토어의 심사기간 동안 오류를 방치하게 되는 일을 없앨 수 있다.
+4. firebase 원격구성(remote config)과 무슨 차이가 있나요?
+   -> CodePush를 알아가다보면 이것과 비슷한 기능으로 [firebase의 원격 구성(remote config)](https://firebase.google.com/docs/remote-config?hl=ko) 기능이 떠오를 수 있다. 업데이트 심사 절차 없이 원격으로 코드를 배포할 수 있다는 관점에서 비슷하다고 생각할 수 있지만 여기서 이 두 개의 차이점이 있다.
+   CodePush는 오류를 수정한다는 관점에서 접근하기 때문에 수정 가능한 전체 영역을 bundle 파일로 변환해 클라우드로 올리는 방식이지만, firebase 원격 구성은 마케팅적인 측면에서 접근하기 때문에 특정 매개변수를 firebase 콘솔에 등록하고 원하는 때에 변수값을 수정하는 방식이다.
+   예를 들어, 앱에서 홍보용 문구를 표시한다고 했을 때 의도치 않게 비속어가 들어간 경우, 이 문구에 대한 매개변수를 firebase에 등록하면 이 변수의 값을 firebase에서 수정했을 때 앱에서도 이 값이 자동으로 적용되는 방식이다. 따라서 전체 코드를 비교해서 수정 및 반영할 수는 없다.
+
+## CodePush 설정하기
+
+=> 예시용으로 보여줄 사진에 보면 검은색 줄을 쳐놓은 부분이 있다. 그건 보안상 모자이크 처리한 정보이니 너무 신경쓰지 말것!!!
+
+### 1. AppCenter cli 설치
+
+```
+npm install -g appcenter-cli
+```
+
+=> npm으로 설치해야 함. yarn으로 설치가 안됨
+
+### 2. appcenter cli 로그인
+
+커맨드에서 아래 명령어 입력
+
+```
+appcenter login
+```
+
+명령어 실행 직후 appcenter 홈페이지가 열린다.
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-codepush/image02.png)
+
+이후 로그인을 완료하면 아래 화면과 함께 로그인 토큰값이 가운데 표시된다.
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-codepush/image03.png)
+
+이 토큰을 복사하고 커맨드 창에 나타나는 토큰 입력 부분에 복사한 토큰을 복붙한다.
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-codepush/image04.png)
+
+> 해당 이미지는 code-push-cli(현재 미지원)로 로그인할 때 표시되는 화면이다.
+> 현재는 appcenter-cli를 사용하고, appcenter-cli에서도 동일하게 나타나니 이대로 토큰만 복붙하면 된다.
+
+### 3. appcenter 콘솔에 앱 등록
+
+아래 명령어를 입력해 appcenter 콘솔에 앱을 등록한다.
+(같은 프로젝트라도 안드로이드용, ios용 앱을 따로 등록해야 한다.)
+
+```
+appcenter apps create -d {앱 이름} -o {os} -p {플랫폼 타입}
+```
+
+> 예시
+> myapp이라는 React-native 프로젝트를 등록하고자 할 때(myapp_android, myapp_ios)
+
+1. appcenter apps create -d myapp_android -o Android -p React-Native
+2. appcenter apps create -d myapp_ios -o iOS -p React-Native
+   => os와 플랫폼 선언시 대소문자까지 위 예시와 같아야 한다!!!!
+
+### 4. 등록된 앱의 Staging, Production 키 등록
+
+등록한 앱마다 Staging 키와 Production 키를 등록한다.
+
+> Staging vs Production
+> Staging: 쉽게 말하면 디버그(Debug)모드와 비슷하다. 앱을 CodePush로 배포하기 전, QA 등 베타 테스터들이 테스트를 해볼 때 사용하는 모드를 말한다.
+> Production: 이것은 우리가 아는 진짜 배포 모드이다. 보통 Staging 모드에서 베타 테스트를 진행하고 테스트가 완료되면 Production 모드로 승격시켜 모든 사용자에게 수정된 앱을 배포한다.
+
+```
+appcenter codepush deployment add -a {user name}/{앱 이름} {모드(Staging or Production)
+```
+
+> 예시
+> 사용자 이름이 gildong일 때
+
+1. appcenter codepush deployment add -a gildong/myapp_android Staging
+2. appcenter codepush deployment add -a gildong/myapp_android Production
+3. appcenter codepush deployment add -a gildong/myapp_ios Staging
+4. appcenter codepush deployment add -a gildong/myapp_ios Production
+
+=> 위의 4개 명령어를 모두 실행해야 한다. 그리고 실행할 때마다 하단에 각 앱과 모드에 맞는 키가 반환된다. 이 키들은 어딘가에 잘 보관해둘것!!!!
+
+만약 키 값을 잊어버렸다면? 아래 명령어를 실행할 것!
+
+```
+appcenter codepush deployment list -a {user name}/{앱 이름} -k
+```
+
+### 5. 프로젝트에 패키지 설치
+
+프로젝트 루트 경로로 들어가서 패키지 설치
+
+```
+yarn add react-native-code-push
+```
+
+### 6. iOS 내부 설정
+
+프로젝트 내 ios 폴더로 들어가서 pod를 설치한다
+
+```
+cd ios && pod install
+```
+
+그 다음, VSCode로 프로젝트를 실행해서 info.plist 파일을 열고 중간에 아래 코드를 추가해준다(아래 예시 그대로 추가하면 된다.)
+
+```
+<key>CodePushDeploymentKey</key>
+<string>${CODEPUSH_KEY}</string>
+```
+
+Xcode로 프로젝트를 실행하고 AppDelegate.m 파일을 열고 파일 내 최상단에 다음 코드를 추가한다.
+
+```
+#import <CodePush/CodePush.h>
+```
+
+그리고 같은 파일 내에서 아래 코드를 검색한다.
+
+```
+return [[NSBundle mainBundle] URLForResource:@"main" withExtension:@"jsbundle"];
+```
+
+이 코드를 아래처럼 수정한다.
+
+```
+return [CodePush bundleURL];
+```
+
+다음부터는 info.plist에서 추가한 CODEPUSH_KEY를 전역변수로 연결하는 과정이다. 정말 중요하니 잘 보고 따라할 것!!!
+
+- Xcode에서 \{프로젝트 이름\} > Project > info > **Configurations**에 들어가 + 버튼을 클릭하고(**아래 사진 속 Configurations 영역에서 Release 밑에 있는 거**) ‘Duplicate Release Configuration’을 선택하고 새로 추가된 설정의 이름을 Staging이라고 수정한다
+
+수정결과
+
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-codepush/image05.png)
+
+- Project > Build Settings에서 상단의 + 버튼을 클릭하고 ‘Add User-Defined Setting을 선택한다’
+
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-codepush/image06.png)
+
+- 새로 추가된 항목의 이름을 ‘MULTI_DEPLOYMENT_CONFIG’라고 주고, Release와 Staging 각 항목에 다음과 같은 값을 추가해준다.
+
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-codepush/image07.png)
+
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-codepush/image08.png)
+
+- 같은 Build Settings 에서 다시 상단에 + 를 클릭하여 ‘Add User-Defined Settings’를 선택하고 이번에 이름을 ‘CODEPUSH_KEY’라고 선언하고, Staging에 Staging deployment key를, Release에는 Production deployment key를 입력한다.
+
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-codepush/image07.png)
+
+### 7. 안드로이드 내부 설정
+
+=> 보통의 안드로이드 내부 설정은 VSCode에서 해도 되지만, 이번 경우에는 안드로이드 스튜디오에서 설정해야 한다(SDK 싱크 문제 때문)
+
+안드로이드 스튜디오로 프로젝트 루트폴더 안에 android 폴더를 실행한다.
+
+gradle.properties 파일 하단에 다음과 같은 코드를 추가해준다.
+
+```
+CODEPUSH_DEPLOYMENT_KEY_DEBUG=
+CODEPUSH_DEPLOYMENT_KEY_STAGING={staging deployment key}
+CODEPUSH_DEPLOYMENT_KEY_PRODUCTION={production deployment key}
+```
+
+그 다음, settings.gradle 파일을 열고 하단에 다음 코드를 추가해준다.
+
+```
+include ':app', ':react-native-code-push'
+project(':react-native-code-push').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-code-push/android/app')
+```
+
+그 다음, MainApplication.java 파일을 열고 상단에 아래 패키지를 import 해준다.
+
+```java
+import com.microsoft.codepush.react.CodePush;
+```
+
+그리고 하단에 new ReactNativeHost(this) 내부 맨 하단에 다음 코드를 추가해준다.
+
+```java
+@Override
+protected String getJSBundleFile() {
+    return CodePush.getJSBundleFile();
+}
+```
+
+그 다음, android/app/build.gradle 로 들어가서 맨 마지막에 다음 코드를 추가해준다.
+
+```
+apply from: "../../node_modules/react-native-code-push/android/codepush.gradle"
+```
+
+같은 파일에서 buildTypes 내부에 다음과 같이 코드를 추가해준다.
+
+```
+buildTypes {
+   debug {
+      ...
+      resValue "string", "CodePushDeploymentKey", CODEPUSH_DEPLOYMENT_KEY_DEBUG
+   }
+   release {
+      ...
+      resValue "string", "CodePushDeploymentKey", CODEPUSH_DEPLOYMENT_KEY_PRODUCTION
+   }
+   releaseStaging {
+      initWith release
+      resValue "string", "CodePushDeploymentKey", CODEPUSH_DEPLOYMENT_KEY_STAGING
+      matchingFallbacks = ['release']
+   }
+}
+```
+
+=> releaseStaging은 새로 추가해줘야 한다.
+
+똑같이 같은 파일에서 android 내에 defaultConfig 내부에 다음 코드를 추가해주고
+
+```
+android {
+	...
+	defaultConfig {
+		...
+		resValue 'string', "CODE_PUSH_APK_BUILD_TIME", String.format("\"%d\"", System.currentTimeMillis())
+	}
+	...
+}
+```
+
+만약, if(enableHermes) \{...\} 블럭이 있다면, 그 안에 다음 코드도 추가해주고 상단의 Sync now를 클릭해준다.
+
+```
+releaseStagingImplementation files(hermesPath + "hermes-release.aar") // 이미 있는 경우도 있다.
+```
+
+### 8. 프로젝트 내부 설정
+
+CodePush는 프로젝트의 최상단 영역인 App.jsx에서 설정해야 한다.
+
+프로젝트의 최상단 파일인 App.jsx(또는 App.js) 파일에 가면 구조가 이렇게 되어있을 것이다.
+
+```javascript
+import React from 'react';
+
+const App = ({}) => {
+	return (
+		...
+	);
+}
+
+export default App;
+```
+
+App.jsx 파일 상단에 CodePush 모듈을 선언하고 하단에 부가적인 옵션을 설정한 다음 App.jsx 파일을 export할 때 해당 옵션이 정의된 채로 CodePush모듈을 씌워서 export하면 된다.
+
+**최종 수정 결과**
+
+```javascript
+import React from 'react';
+import CodePush from 'react-native-code-push';
+
+const App = ({}) => {
+	return (
+		...
+	);
+}
+
+const codePushOptions = {
+  checkFrequency: CodePush.CheckFrequency.ON_APP_START,
+  updateDialog: {
+    title: '...',
+    optionalUpdateMessage: '...',
+    optionalInstallButtonLabel: '업데이트',
+    optionalIgnoreButtonLabel: '아니요.'
+  },
+  installMode: CodePush.InstallMode.IMMEDIATE
+}
+
+export default CodePush(codePushOptions)(App);
+```
+
+CodePush 동작 옵션
+
+- checkFrequency: 언제 업데이트를 할 건지 시기를 지정한다
+
+  > 옵션 항목
+  > CodePush.CheckFrequency.ON_APP_START: 앱을 첫 실행할 때마다
+  > CodePush.CheckFrequency.ON_APP_RESUME: 앱을 잠시 나갔다가 다시 들어올 때 마다 \{ex) 홈버튼을 눌렀다가 다시 앱 실행하는 경우\}
+  > CodePush.CheckFrequency.MANUAL: 수동지정(앱 코드에서 호출될 때마다)
+
+- deploymentKey(String): 배포키 지정(이건 안드로이드 또는 ios 네이티브단에서 전역으로 설정해주니 생략해도 된다)
+- installMode: 선택적 업데이트를 실행할 시기를 선언한다.
+
+  > 옵션 항목
+  > CodePush.InstallMode.IMMEDIATE: 즉시 업데이트하고 다시 실행
+  > CodePush.InstallMode.ON_NEXT_RESTART: 업데이트를 설치하려 하지만 강제로 앱을 재실행하진 않음. 앱이 자연스럽게 재실행되면 자동으로 업데이트를 실행한다.(자동 업데이트를 걸 때 좋음)
+  > CodePush.InstallMode.ON_NEXT_RESUME: 업데이트를 실행하지만 앱 종료 후 사용자가 앱을 재실행할 때까지 앱이 자동으로 재실행되지 않는다.
+
+- mandatoryInstallMode: 필수로 설치된 업데이트를 실행할 시기를 선언한다.
+
+  > 옵션 항목
+  > CodePush.InstallMode.IMMEDIATE: 즉시 업데이트하고 다시 실행(default)
+  > CodePush.InstallMode.ON_NEXT_RESTART: 업데이트를 설치하려 하지만 강제로 앱을 재실행하진 않음. 앱이 자연스럽게 재실행되면 자동으로 업데이트를 실행한다.(자동 업데이트를 걸 때 좋음)
+  > CodePush.InstallMode.ON_NEXT_RESUME: 업데이트를 실행하지만 앱 종료 후 사용자가 앱을 재실행할 때까지 앱이 자동으로 재실행되지 않는다.
+
+- updateDialog: 업데이트를 실행할 수 있을 때 사용자에게 알려줄 dialog
+  > 옵션 항목
+  > title: "dialog 제목"
+  > optionalUpdateMessage: "dialog에 띄울 메세지"
+  > optionalInstallButtonLabel: "업데이트 실행버튼 라벨 => ex) '예'버튼"
+  > optionalIgnoreButtonLabel: "업데이트 미실행버튼 라벨 => ex) '아니오'버튼"
+
+위에서 적은 옵션들은 가장 많이 사용할 것 같은 것들만 정리한 것들이다. 자세한 것은 하단의 공식문서에서 참고할 것!!!
+CodePush 전체 Option(공식문서) => [바로가기](https://docs.microsoft.com/ko-kr/appcenter/distribution/codepush/rn-api-ref#codepushoptions)
+
+## 기본적인 사용방법
+
+일단 codepush cli를 사용하려면 cli가 로그인이 되어 있어야 한다.
+cli 로그인 => 위 설정방법 2번(위에서 설정하면서 로그인이 다 완료되었으면 넘어갈 것)
+
+appcenter에 로그인하고 들어가면 아래와 같은 화면이 나타나면서 설정하면서 등록한 앱들이 나타날 것이다.
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-codepush/image10.png)
+원하는 앱을 선택하고 왼쪽 메뉴에서 distribute > CodePush로 들어간다. 그러면 지금까지 CodePush로 배포가 이뤄진 버전들이 있을 것이다.
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-codepush/image11.png)
+
+- **커맨드로 배포하기**
+
+```
+appcenter codepush release-react -a {user name}/{앱 이름} -d {type(Production or Staging)}
+```
+
+이 명령어를 실행하고 업로드가 완료되는 데 최대 1,2분정도 걸릴 수 있다.
+이 명령어 끝에 **-m** 테그를 같이 붙여서 실행하면 해당 업데이트는 사용자의 의사와 관계없이 **강제로 업데이트를 실행**하게 할 수 있다.
+
+**명심할 것!!!!**
+CodePush로 업데이트할 때는 자바스크립트 파일 내부에서 수정한 내용들만 업로드할 수 있고, 만약 자바스크립트 파일을 중간에 새로 추가하거나 삭제한 경우 CodePush로 올라갈 수 없기 때문에 이 경우 각 스토어의 심사를 통해 업데이트 해야 한다.
+=> 안드로이드나 ios 네이티브 영역에서 실행한 코드들도 업로드가 불가능하다.
+
+- **업데이트 롤백**
+
+```
+// type: Production or Staging
+
+// 가장 최근 내용을 롤백하려면
+appcenter codepush rollback -a {user name}/{앱 이름} {type}
+// ex) appcenter codepush rollback -a company1/myApp_android Production
+
+// 선택적 내용을 롤백하고자 하면
+appcenter codepush rollback -a {user name}/{앱 이름} {type} --target-release {release id}
+// ex)
+// v1으로 rollback하려는 경우
+// appcenter codepush rollback -a company1/myApp_android Production --target-release V1
+```
+
+여기서 V1이라고 적힌 것은 CodePush로 배포된 업데이트 id다. 이것은 위에 Appcenter 콘솔에 CodePush로 들어가면 확인할 수 있다.
