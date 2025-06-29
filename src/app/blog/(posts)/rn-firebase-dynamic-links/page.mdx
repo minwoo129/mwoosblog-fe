@@ -1,0 +1,302 @@
+export const metadata = {
+  title: 'React Native에서 다이나믹 링크 사용하기(v5)',
+  description: '',
+  category: 'React Native Firebase',
+  createdAt: '2022-06-28T03:19:26.966Z',
+  thumbnailImg:
+    'https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-firebase-dynamic-links/image01.jpeg',
+  tags: [],
+};
+
+<BlogTitle {...metadata} />
+
+> **알려드립니다**
+> 2023년도 구글에서 2025년 8월 이후 Firebase Dynamic Links의 완전 지원종료를 발표한 상태입니다. 현재 작성 시점(2024년 3월) 기준으로 등록은 가능하지만 다른 대체 수단으로 마이그레이션이 필요한 상황이니 이점 참고하시기 바랍니다.
+> Dynamic Links의 지원종료가 발표되면서 구글링을 하다보면 이를 대체하기 위한 관련 글이 조금씩 올라오곤 있고, Firebase 팀의 공식 발표가 나오긴 했지만 정보가 많이 부족한 상태입니다. 저도 이와 관련해서 2024년 구글IO를 통해 Firebase 팀이 이와 관련한 추가 공식 발표를 할지 여부를 기다리고 있기 때문에 이와 관련한 내용이 올라오면 포스트를 정리해서 올리겠습니다.
+
+이번에는 내가 근무하고 있는 회사에서 앱을 개발하면서 배웠던 내용들을 정리해보자 한다. 보통 앱을 개발하게 되면, 만약에 기획내용에 따라 앱이 소셜 컨샙을 잡고있어 공유기능이 추가되는 경우가 많을 것이다. 만약 공유기능이 추가된다면 공유할 때 링크를 하나 추가해 앱에 접근하고, 원하는 페이지에 접근할 수 있어야 회원들을 보다 적극적으로 끌어들일 수 있을 것이다. 그런데 문제가 하나 있다. 딥링크를 사용하게 되는 경우 안드로이드와 ios간의 호환성 문제가 발생하게 되어 안드로이드 단말기에서 생성한 링크를 아이폰에서 실행할 수 없게 된다. 만약 카카오톡으로만 공유를 한다고 하면 카카오 디벨로퍼에서 제공하는 메세지 api를 사용하면 되지 않겠나 생각을 하겠지만, 카카오에도 카카오만의 자체 링크기능이 있어 카카오 메세지에서의 링크 알고리즘을 정확히 알지 못하면 다른 단말기에서 수신에 실패할 수 있다. 이러한 문제를 정말 쉽게 해결할 수 있는 것이 바로 파이어베이스의 "다이나믹 링크"였고, 내가 회사에서 개발하고 있는 앱에도 적용한 다음 카카오 공유 api 대신 다이나믹 링크만 사용하자고 기획팀장님께 말씀드렸더니 같이 적용해보자고 하셨다.
+그러면 과연 다이나믹 링크가 무엇이고 react native에서는 어떻게 설정하고 어떻게 링크를 생성하고 링크를 수신할 수 있도록 하는지 최대한 쉬우면서 확실한 방법으로 정리해보겠다.
+
+# 다이나믹 링크
+
+[![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-firebase-dynamic-links/image02.jpeg)](https://youtu.be/LvY1JMcrPF8) **위의 이미지 클릭**
+
+파이어베이스의 다이나믹 링크는 앱의 설치여부와 관계 없이 다양한 플랫폼에서 원하는 대로 기능을 동작하도록 하는 링크이다. 사실 이 기능은 기존에 존재하던 "딥링크"라는 개념에서 시작하였다. 딥링크는 안드로이드, ios 등 다양한 플랫폼에서 앱을 실행했을 때 앱을 실행하는 것을 넘어 원하는 페이지로 이동하고 원하는 기능을 실행해 줄 수 있는 모바일 환경에서의 또다른 링크 개념이다. 하지만 딥링크에는 몇가지 문제점이 있었다. 가장 대표적으로 안드로이드와 ios간의 호환이 안된다는 것이다. 따라서 안드로이드 앱에서 생성한 링크를 ios 앱에서는 이 링크를 인식할 수 없어 원하는 기능 실행은 물론 앱 실행도 불가능하다. 그리고 설령 안드로이드 앱에서 링크를 실행한다 하더라도, 앱이 설치되있지 않으면 실행이 안되는 것은 물론 오작동을 일으킬 수 있다.
+이 때 등장한 것이 바로 "다이나믹 링크"였다. 일단 다이나믹 링크는 안드로이드와 ios에서의 링크 스키마를 사용하지 않고, 스키마로 https를 사용하기 때문에 설정만 해주면 안드로이드와 ios 그리고 웹에서 모두 작동한다. 그리고 만약에 앱이 설치되어 있지 않다면 원하는 다른 페이지로 접근(앱스토어 설치 링크 또는 미리 만들어 놓은 다른 웹사이트)하도록 설정할 수 있다. 추가적으로 딥링크는 링크를 실행했을 때 원인을 알 수 없는 오류로 인해 링크 안에 생성한 데이터를 앱이 인식하지 못하는 문제가 있는데, 다이나믹 링크가 이 문제를 해결할 수 있다.
+
+# 다이나믹 링크 연결설정
+
+> 설정 기준
+> 패키지: [react-native-firebase](https://v5.rnfirebase.io/docs/v5.x.x/installation/initial-setup) => v5 버전
+
+본 설명은 react native 프로젝트에 안드로이드, ios에서의 파이어베이스 설정이 모두 되어있다라는 전제하에 작성하였다. 즉 패키지를 설치하고 파이어베이스 콘솔에 프로젝트 설정과 앱 생성까지 모두 되어있어야 한다.
+
+## 1. 다이나믹 링크 설정(프리픽스 설정)
+
+파이어베이스 콘솔에 프로젝트를 생성하고 안드로이드, ios에서의 설정을 완료하면 콘솔을 통해 프로젝트에 접속한다. 그리고 왼쪽 하단에 보면 Dynamic Links라고 적힌 항목이 있을 것이다.
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-firebase-dynamic-links/image03.png)
+그 안으로 들어가면 처음에는 이런 화면이 나타난다.
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-firebase-dynamic-links/image04.png)
+상단의 시작하기를 누르고 원하는 단어를 입력하면 하단에 다이나믹 링크 default 형식(ex) apptest라는 단어를 작성했을 때, apptest.page.link)이 나타난다.
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-firebase-dynamic-links/image05.png)
+그 링크 형식을 선택하고 계속을 누른 다음 완료를 클릭하면 파이어베이스에서의 설정은 끝났다.
+
+> **프리픽스(prefix)란?**
+> 프리픽스는 파이어베이스 다이나믹 링크에서 사용하게 될 주소 형식이다. 네이버가 naver.com인 것과 같은 것이다. 프리픽스는 원하는 주소로 설정하면 되고 만약 링크가 마음에 안든다면 새로 추가하거나 삭제해도 된다.(수정은 안된다)
+
+> **설명을 위한 프로젝트 설정 값**
+> 파이어베이스 프리픽스: linkEx.page.link
+> 안드로이드 패키지 네임: com.linkEx
+> ios Bundle Id: com.linkEx
+
+## 2. 안드로이드 설정
+
+### 의존성 설정
+
+react native 프로젝트를 실행하고 android/app/build.gradle에 접근하면 하단에 dependencies라는 블럭이 있을 것이다. 이 블럭 안에 이 두줄을 추가해준다.
+
+```
+implementation "com.google.firebase:firebase-dynamic-links:19.0.0"
+implementation "com.google.firebase:firebase-invites:17.0.0" // 이 코드를 추가하지 않으면 링크 리스너 실행시 앱이 죽는다.
+```
+
+그 다음, android/app/src/main/java/.../MainApplication.java로 들어가서 상단에 아래 패키지를 추가한다.
+
+```
+...
+import io.invertase.firebase.links.RNFirebaseLinksPackage;
+```
+
+그리고 하단에 getPackages() 메서드 안에 코드를 한줄 추가해주면 되는데, 아래 형식처첨 추가하면 된다.
+
+```
+@Override
+protected List<ReactPackage> getPackages() {
+	@SuppressWarnings("UnnecessaryLocalVariable")
+    List<ReactPackage> packages = new PackageList(this).getPackages();
+    ...
+    packages.add(new RNFirebaseLinkPackage()); // 이 한줄을 추가해주면 됨
+    return packages;
+}
+```
+
+안드로이드는 이걸로 끝이다. 파이어베이스 프로젝트에 안드로이드 앱을 생성할 때 앱 패키지 네임만 일치하면 링크를 타고 앱이 실행될 것이다.
+
+## 3. iOS 설정
+
+ios 설정 과정은 좀 복잡해서 최대한 쉽고 자세히 설명하겠다.
+
+### pod 의존성 설정
+
+react native 프로젝트에서 ios/Podfile을 열고 상단에 pod라고 하나로 몰아져있는 영역에 이 코드를 추가해준다.
+
+```
+pod 'Firebase/DynamicLinks', '~> 6.13.0'
+```
+
+그리고 터미널에서 프로젝트의 ios 디렉토리로 접근해 pod를 설치해준다.
+
+```
+pod install
+```
+
+### 인증서, 프로파일 설정
+
+ios의 경우 링크 기능을 사용하기 위해서는 배포 인증서와 프로파일에 링크 사용을 위한 기능 추가를 해줘야 ios 앱이 링크를 인식하고, 또 앱스토어 배포가 가능하기 때문에 기존에 설정한 인증서와 프로파일이 있다면 새로 발급받아야 한다.
+
+apple developer에 로그인하고 접근하면 Certificates, Identifiers & Profiles -> Identifiers로 들어가 자신의 앱의 Identifier에 접근한다. 그리고 하단의 Associated Domains를 체크하고 Save를 누른다.
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-firebase-dynamic-links/image06.png)
+
+그리고 밖으로 나오고 왼쪽 옆의 Profiles로 들어가서 개발용, 배포용 프로파일을 각자 다시 다운받아야 한다.
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-firebase-dynamic-links/image07.png)
+
+그 다음 Xcode로 앱을 실행하고(프로젝트 루트의 ios 디렉토리를 Xcode로 실행하면 됨), Xcode 왼쪽 메뉴의 맨 위에있는 프로젝트 이름을 클릭하고 그 안에 Signing & Capabilities로 접근한다.
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-firebase-dynamic-links/image08.png)
+(보안을 위해 관련 정보는 모자이크 처리함)
+그리고 상단의 + 버튼을 누르고 검색창에 Associated Domains를 검색하고 추가해준다.
+그러면 하단에 Associated Domains라는 영역이 하나 잡히는데, 그 안에 링크를 다음과 같은 형식으로 추가해준다.
+
+```
+applinks:linkEx.page.link
+```
+
+그리고 상단의 Info 탭을 클릭하고 맨 아래로 내려가면 URL Type라고 적힌 부분이 있을 것이다. 그걸 열고 url types를 하나 추가해준다. 여기서 Identifier에는 https 스키마를 포함한 url 프리픽스(https://linkEx.page.link), URL Schemes에는 앱의 bundle ID(com.linkEx)를 입력한다.
+
+### 기타 코드 추가
+
+이 부분은 살짝 어려울 수도 있다. AppDelegate.m 파일을 건드려야 되는데, 기존에 만약에 네아로(네이버 아이디 로그인)나 카카오 로그인 설정을 해놓은 경우 조건문을 연결해야 하기 때문이다.
+
+일단 AppDelegate.m 파일로 들어가서 파일 최상단에 두개의 헤더를 import 해준다.
+
+```
+import <React/RCTLinkingManager.h>
+import "RNFirebaseLinks.h"
+```
+
+그 다음 @implementation AppDelegate라고 적혀있는 곳 하단에 다음 코드를 추가해준다.
+
+```
+- (BOOL)application:(UIApplication *)application
+continueUserActivity:(NSUserActivity *)userActivity
+ restorationHandler:(void (^)(NSArray *))restorationHandler {
+     return [[RNFirebaseLinks instance] application:application continueUserActivity:userActivity restorationHandler:restorationHandler];
+}
+```
+
+그리고 하단에 didFinishLaunchingWithOptions 메서드 최상부에 다음 코드를 추가해준다.
+
+```
+[FIROptions defaultOptions].deepLinkURLScheme = @"Info탭에 추가한 URL type의 URL Schemes(앱의 bundle Id, com.linkEx)";
+```
+
+마지막으로 설명할 부분이 많이 햇갈릴 수 있다. 네아로나 카카오 로그인 연결 설정을 해놓은 경우 조건에 따라 이 부분을 제어해야 하고, 지금은 없지만 나중에 이 두 소셜 로그인을 연결하는 경우 그 이후에 또 이 부분을 건드려야 하기 때문이다.
+
+AppDelegate.m 최하단 @end 바로 위에 다음과 같은 메서드를 추가해준다.
+
+```
+- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+            options:(NSDictionary<NSString *, id> *)options {
+    return [[RNFirebaseLinks instance] application:application openURL:url options:options];
+}
+```
+
+만약 네아로, 카카오 로그인 등 다른 기능을 연결하면서 이 메서드가 이미 존재할 경우에는 다음과 같이 작성해준다.
+
+```
+- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+            options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
+		...
+        // 이 하단 세 줄은 적당한 곳에 추가해주면 된다.
+		BOOL handled = [RCTLinkingManager application:application openURL:url options:options];
+	  if(!handled) {
+	    return [[RNFirebaseLinks instance] application:application openURL:url options:options];
+	  }
+}
+```
+
+# 사용하기
+
+여기까지 다이나믹 링크를 사용하기 위한 기본적인 설정은 다 끝났다. 여기부터는 실제로 링크를 생성하고 수신받는 등 기본적으로 사용하는 방법을 설명하겠다.
+
+## 링크 생성하기
+
+보통 안드로이드에서는 파이어베이스 패키지를 사용해서 링크를 생성하려면 파이어베이스 콘솔에 프로젝트 초기설정을 하면서 SHA256 암호키를 미리 등록하고 파이어베이스 연결파일을 다운받아야 하고 여러가지 복잡한 문제들이 있을 수 있다. 그럴 때는 파이어베이스 프로젝트에 웹앱을 하나 추가해서 api 키를 받은 다음 REST API로 링크를 생성하는 것이 가장 확실하면서 쉬운 방법이다. 그래서 이번에는 REST API로 링크를 생성하는 방법만 설명하겠다.
+
+### 매개변수로 짧은 링크 만들기(코드 출처: [파이어베이스 동적링크 문서](https://firebase.google.com/docs/dynamic-links/rest?hl=ko&authuser=0))
+
+```
+POST https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=api_key
+Content-Type: application/json
+
+{
+  "dynamicLinkInfo": {
+    "domainUriPrefix": "https://linkEx.page.link",
+    "link": "https://linkEx.page.link/",
+    "androidInfo": {
+      "androidPackageName": "com.linkEx"
+    },
+    "iosInfo": {
+      "iosBundleId": "com.linkEx"
+    }
+  },
+  "suffix": {
+  	"option": "SHORT"
+  }
+}
+```
+
+아래에 나올 코드는 위의 예시 코드를 react native에서 메서드로 정리한 것이다.
+
+```javascript
+import axios from 'axios';
+
+const encodeFirebaseDynamicLink = () => {
+	axios({
+	method: 'post',
+	url: 'https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=api_key'
+	params: null,
+	data: {
+		dynamicLinkInfo: {
+	    domainUriPrefix: "https://linkEx.page.link",
+	    link: "https://linkEx.page.link/",
+	    androidInfo: {
+	      androidPackageName: "com.linkEx"
+	    },
+	    iosInfo: {
+	      iosBundleId: "com.linkEx"
+	    }
+	  },
+	  suffix: {
+	  	option: "SHORT"
+	  }
+	}
+});
+}
+```
+
+## 링크 리스너 추가
+
+링크 리스너는 앱에서 처음 접근하는 페이지에 추가하면 되고 useEffect를 사용해 최초 접근시에만 리스너를 실행시켜주면 된다.
+
+리스너 코드 예시
+
+```javascript
+import firebase from 'react-native-firebase';
+
+const firebaseLinkListener = () => {
+  firebase
+    .links()
+    .getInitialLink()
+    .then(url => {
+      console.log(url); // 이 url은 위에서 링크 생성 메서드 중에 link를 의미한다.
+    });
+};
+```
+
+## api 호출 형식
+
+### 요청 본문 형식
+
+이 내용은 많이 쓸 것 같은 내용만 정리하였다 => [다이나믹링크 본문 전체 형식](https://firebase.google.com/docs/reference/dynamic-links/link-shortener?authuser=0&hl=ko)
+
+```javascript
+{
+  "dynamicLinkInfo": {
+    "domainUriPrefix": "디폴트 프리픽스, string",
+    "link": "링크, string(이 링크에 원하는 접근 경로 및 데이터를 담으면 됨)",
+    "androidInfo": { // 안드로이드 정보
+      "androidPackageName": "안드로이드 패키지 네임, string",
+      "androidFallbackLink": "안드로이드 폴백 링크, string(안드로이드에서 앱이 설치되있지 않을 때 접근할 경로)",
+      "androidMinPackageVersionCode": "안드로이드에서 링크를 실행할 최소 versioncode, string(versioncode: 프로젝트 루트/android/app/build.gradle에 적혀있음)"
+    },
+    "iosInfo": { // ios 정보
+      "iosBundleId": "ios bundle Id, string",
+      "iosFallbackLink": "ios 폴백 링크, string(ios에서 앱이 설치되있지 않을 때 접근할 경로)",
+      "iosCustomScheme": "앱의 번들 ID가 아닌 것으로 정의된 경우 앱의 사용자 지정 URL 체계, string",
+      "iosIpadFallbackLink": "ipadOS 폴백링크, string(ipad에서 앱이 설치되있지 않을 때 이동할 경로), ",
+      "iosIpadBundleId": "iPad에서 링크를 여는 데 사용할 iOS 앱의 bundle Id, string",
+      "iosAppStoreId": "appstore app Id, string(앱이 설치되지 않았을 때 사용자를 App Store로 보내는 데 필요)"
+    },
+    "socialMetaTagInfo": { // 소셜 메타태그 정보
+      "socialTitle": "메타태그 타이틀(제목), string",
+      "socialDescription": "메타태그 본문 내용, string",
+      "socialImageLink": "메타태그 이미지 링크, string"
+    }
+  },
+  "suffix": { // 링크 접미사 속성
+    "option": "SHORT" or "UNGUESSABLE"
+  }
+}
+```
+
+> **소셜메타태그**
+> 링크 안에 간단한 타이틀과 본문, 이미지를 함께 첨부해서 링크를 생성할 수 있는 기능
+
+ex) 소셜메타태그가 담긴 링크를 카톡으로 공유했을 때
+![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/rn-firebase-dynamic-links/image09.png)
+
+> 링크 접미사
+> SHORT: 링크 끝에 영어, 숫자로 조합된 길이가 4인 문자열이 출력됨
+> UNGUESSABLE: 링크 끝에 영어, 숫자로 조합된 예측할 수 없는 길이 17의 문자열이 출력됨

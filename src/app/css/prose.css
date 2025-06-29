@@ -5,9 +5,11 @@
 @layer components {
   .prose h1 {
     @apply text-white;
+    @apply mt-[40px];
   }
   .prose h2 {
     @apply text-white;
+    @apply mt-[40px];
   }
   .prose p {
     @apply text-white;
