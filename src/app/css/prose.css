@@ -43,4 +43,8 @@
   .prose strong {
     @apply text-yellow-500 font-bold;
   }
+
+  .prose img {
+    @apply bg-white;
+  }
 }
