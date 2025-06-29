@@ -19,7 +19,7 @@ const ThumbnailImg = async ({title, thumbnailImg}: ThumbnailImgProps) => {
     await getPlaceholderImage(thumbnailImg);
 
   return (
-    <div className="mx-auto aspect-video">
+    <div className="mx-auto">
       <Image
         src={src}
         alt={`${title} 포스터 이미지`}
