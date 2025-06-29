@@ -1,0 +1,241 @@
+export const metadata = {
+  title: 'Jetpack Glance를 사용한 Android 위젯 구축 - 구글IO 2024',
+  description: '',
+  category: '',
+  createdAt: '2024-06-07T04:51:41.360Z',
+  thumbnailImg:
+    'https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/googleio24-jetpack-glance/image01.jpg',
+  tags: ['Glance', 'android', 'compose', 'jetpack', '구글io'],
+};
+
+<BlogTitle {...metadata} />
+
+2024 구글IO의 4번째 순서, 바로 Getpack Glance를 사용한 안드로이드 위젯 구축입니다.
+
+# 1. Getpack Glance
+
+Jetpack Glance는 안드로이드의 선언형 UI 개발 툴킷인 Jetpack Compose를 기반으로 위젯을 개발하는 툴킷입니다.
+기존에 안드로이드에서 위젯을 개발할 때는 기존 안드로이드 앱 개발방식과 같은 XML 레이아웃을 사용해 UI를 구성하는 방법으로 개발해왔습니다. 하지만 이제 Jetpack Compose를 기반으로 한 앱 개발이 점차 확대되면서 이제 위젯을 개발할 때도 Jetpack Compose를 기반으로 개발할 수 있게 된 것입니다.
+
+# 2. 안드로이드 위젯의 기본적인 작동 원리
+
+## 2-1. AppWidgetHost
+
+위젯을 추가할 수 있는 영역으로서, 안드로이드 폰으로 따지면 홈화면이라고 생각하면 됩니다.
+
+## 2-2. AppWidgetProviderInfo
+
+AppWidgetProviderInfo는 위젯의 레이아웃 및 크기, 업데이트 빈도 등의 메타데이터를 표시하는 xml 형태의 파일입니다.
+
+## 2-3. AppWidgetProvider
+
+AppWidgetHost에서 위젯이 업데이트, 활성화, 비활성화 또는 삭제될 때 Android OS에서 넘어오는 메세지를 들을 수 있는 브로드캐스트 리시버입니다. Java 또는 Kotlin으로 작성된 클래스 형태로 구성됩니다.
+
+## 2-4. 기본적인 원리
+
+안드로이드 위젯은 보통 앱 내부가 아닌 단말기의 홈화면에서 동작하기 때문에 안드로이드 앱에서 독립된 라이프사이클로 동작하게 됩니다. 이미 앱에서 분리된 프로세스에서 실행되기 때문에 remote view는 자체적인 API를 가지게 되죠.
+
+아래 코드는 안드로이드 앱 내 AndroidManifest.xml 파일에 추가될 위젯의 receiver 태그 예시입니다.
+
+```xml
+<receiver
+	android:name=".helloworld.HelloWorldWidgetReceiver"
+	android:exported="true"
+	android:label="Hello World">
+	<intent-filter>
+		<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+	</intent-filter>
+	<meta-data
+		android:name="android.appwidget.provider"
+		android:recource="@xml/hello_world_widget_info"
+	/>
+</receiver>
+```
+
+이와 같은 receiver를 연결시켜 놓으면 사용자가 홈화면에 위젯을 추가했을 때 Android OS에서 발송된 메세지를 HelloWorldWidgetReceiver라는 Provider가 들을 수 있게 되고, 이를 통해 위젯의 업데이트 등의 기능이 실행되게 됩니다.
+
+# 3. Jetpack Glance의 구성요소
+
+> 아래 코드는 본 강의를 통해 제공된 예시 코드를 Jetpack Glance의 구조에 맞게 조합해 재연한 코드입니다.
+
+```kotlin
+class HelloWorldWidget: GlanceAppWidget() {
+	override suspend fun provideGlance(context: Context, id: GlanceId) {
+		provideContent {
+			HelloWorldContent()
+		}
+	}
+
+    @Composable
+    fun Content() {
+    	GlanceTheme {
+			Row(
+				modifier = GlanceModifier
+						.fillMaxSize()
+						.padding(16.dp)
+						.background(GlanceTheme.colors.widgetBackground)
+						.appWidgetBackground(),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalAlignment = Alignment.CenterVertically
+			) {
+				Image(
+					provider = iconProvider,
+					contentDescription = iconDescription,
+					modifier = GlanceModifier.size(48.dp),
+					colorFilter = ColorFilter.tint(GlanceTheme.colors.primary)
+				)
+				Spacer(modifier = GlanceModifier.width(8.dp))
+				Column(verticalAlignment = Alignment.CenterVertically) {
+					Text(text = titleText, style = primaryTextStyle)
+					Text(text = supportingText, style = supportingTextStyle)
+				}
+			}
+		}
+    }
+}
+
+class HelloWorldWidgetReceiver: GlanceAppWidgetReceiver() {
+	override val glanceAppWidget: GlanceAppWidget = HelloWorldWidget()
+}
+```
+
+## 3-1. GlanceAppWidget
+
+위젯의 레이아웃을 정의하고 데이터 업데이트, 사용자 상호작용을 처리하는 영역입니다. 쉽게 얘기하면 UI 구성 영역에 해당합니다. 위젯을 구성하고자 할 때 위젯 클래스가 이 클래스를 상속하는 구조가 되어야 합니다.
+
+## 3-2. GlanceAppWidgetReceiver
+
+Jetpack Glance로 개발한 위젯에서 사용하게 될 AppWidgetProvider 입니다. 즉 Glance로 개발한 위젯이 안드로이드 OS에서 넘어온 메세지를 들을 수 있는 브로드캐스트 리시버 역할을 하게 됩니다.
+위젯을 개발할 때 각 위젯별로 별도의 Receiver 클래스가 존재해야 하고, 각 Receiver 클래스는 GlanceAppWidgetReceiver 클래스를 상속하는 구조가 되어야 합니다.
+
+# 4. Glance를 사용해 위젯을 개발하기(예시)
+
+## 4-1. 프로젝트에 Glance 추가하기
+
+app단의 build.gradle 파일에 접속해 dependencies 블록 안에 Glance SDK를 추가하고 Android Studio에서 Sync 처리를 해줍니다.
+
+```groovy
+implementation("androidx.glance:glance-appwidget:1.1.0-rc01")
+implementation("androidx.glance:glance-material3:1.1.0-rc01")
+```
+
+-> 24/05/23 기준 버전
+
+## 4-2. 위젯 추가
+
+GlanceAppWidget 클래스를 상속하는 Kotlin 클래스를 추가하고 provideGlance 함수를 추가해줍니다.
+
+> Android Studio 위젯 추가 기능으로 위젯을 추가하면 기존 xml 레이아웃으로 위젯이 추가됩니다. 그 때 생성된 xml 파일은 그냥 내버려 두시고, Kotlin 클래스만 GlanceAppWidget 클래스를 상속하도록 바꿔주면 Glance를 사용한 앱 위젯 UI 구성이 가능해집니다.
+
+```kotlin
+import android.content.Context
+import androidx.glance.GlanceId
+import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.provideContent
+import androidx.glance.text.Text
+
+class HelloWorldWidget: GlanceAppWidget() {
+	override suspend fun provideGlance(context: Context, id: GlanceId) {
+		provideContent{
+			Text("Hello, World")
+		}
+	}
+}
+```
+
+## 4-3. 리시버 추가
+
+GlanceAppWidgetReceiver 클래스를 상속하는 리시버 클래스를 추가해줍니다. 이 클래스는 위젯을 추가한 파일과 동일한 파일에 추가해주면 됩니다.
+
+```kotlin
+import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetReceiver
+
+...
+
+class HelloWorldWidgetReceiver: GlanceAppWidgetReceiver() {
+	override val glanceAppWidget: GlanceAppWidget
+			get() = HelloWorldWidget()
+}
+```
+
+## 4-4. AppWidgetProviderInfo 파일 추가
+
+프로젝트 내 res/xml 폴더 안에 AppWidgetProviderInfo 파일을 추가합니다.
+=> 이 파일은 Android Studio에서 위젯을 추가하면 자동으로 생성되는 파일이니 별도로 생성하실 필요는 없습니다.
+
+```xml
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+	android:resizeMode="horizontal|vertical"
+	android:minHeight="128dp"
+	android:minWidth="128dp"
+	android:description="@string/widget_names_hello_world"
+	android:updatePeriodMillis="3600000"
+	android:minResizeHeight="128dp"
+	android:minResizeWidth="128dp"
+	android:maxResizeHeight="512dp"
+	android:maxResizeWidth="512dp"
+	android:targetCallWidth="2"
+	android:targetCallHeight="2"
+	android:initialLayout="@layout/glance_default_loading_layout">
+</appwidget-provider>
+```
+
+## 4-5. AndroidManifest에 ProviderInfo 연결
+
+프로젝트의 AndroidManifest.xml 파일에 추가한 위젯의 ProviderInfo 파일을 연결합니다.
+=> 이 코드도 Android Studio에서 위젯을 추가하면 자동으로 추가되는 코드이니 별도로 추가하실 필요는 없습니다.
+
+```xml
+<receiver
+	android:name=".helloworld.HelloWorldWidgetReceiver"
+	android:exported="true"
+	android:label="Hello World">
+	<intent-filter>
+		<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+	</intent-filter>
+	<meta-data
+		android:name="android.appwidget.provider"
+		android:resource="@xml/hello_world_widget_info"
+	/>
+</receiver>
+```
+
+## 4-6. Glance로 위젯을 개발할 때 주의사항
+
+Glance가 Jetpack Compose를 기반으로 개발된 툴킷이라 UI 컴포넌트를 import할 때 Compose용 컴포넌트를 import하는 상황이 발생할수도 있습니다. Glance는 **Glance 전용 UI 컴포넌트가 따로 있으니** 사용할 때 주의해야 합니다.
+
+### Compose에서 사용되는 UI 컴포넌트
+
+```kotlin
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Image
+import androidx.compose.material3.Text
+import androidx.compose.material3.Button
+```
+
+### Glance에서 사용되는 UI 컴포넌트
+
+```kotlin
+import androidx.glance.layout.Column
+import androidx.glance.layout.Row
+import androidx.glance.text.FontWeight
+import androidx.glance.text.Text
+import androidx.glance.text.TextStyle
+import androidx.glance.Image
+import androidx.glance.Button
+```
+
+# 5. 마지막으로
+
+이번 강의는 Glance와 관련된 내용만 다루고 그 외에 제가 판단했을 때 크게 중요하지 않다고 판단되는 부분은 생략하였습니다. 이점 양해 부탁드립니다.
+이번 Glance 발표를 통해서 제가 느낀 점은 이제 구글에서도 Android 개발 방식에 대한 대변화를 진행하고 있다는 느낌이 들었습니다. 제가 생각했을 때도 이제는 Compose를 사용한 직관적인 UI 개발 기법을 사용해 앱 UI를 개발하고, 위젯 또한 Glance를 사용해 직관적인 UI 개발 기법을 적용하면서 앞으로도 이러한 기법들이 계속해서 확대해 나갈 것 같다는 생각이 들었습니다.
+
+> 제가 5월 21에 Android 온디바이스 GenAI 작동 원리에 관한 강의 내용을 올리고 1주일 안에 바로 작성해서 업로드하려고 했으나 제가 회사일 관련해서 갑자기 중요한 일이 많아져 업로드가 지연되었습니다.
+> 이제는 제가 언제가 될지는 모르겠지만 올해 구글IO 강의 중에서 추가로 괜찮은 강의를 발견하면 추가로 작성해서 올리도록 하겠습니다.
+
+# 강의 링크(Youtube)
+
+[![](https://edqtpvyrloqd28014065.gcdn.ntruss.com/blog/googleio24-jetpack-glance/image02.jpg)](https://youtu.be/jI1LKN7jBVk?si=3n_M7WhGbIK2nXmO)
