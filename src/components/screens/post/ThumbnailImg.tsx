@@ -7,11 +7,11 @@ interface ThumbnailImgProps {
   thumbnailImg: string;
 }
 
-const ThumbnailImg = async ({title, thumbnailImg}: ThumbnailImgProps) => {
+const ThumbnailImg = async ({ title, thumbnailImg }: ThumbnailImgProps) => {
   if (!thumbnailImg) {
     return null;
   }
-  const {src, width, height, placeholder} =
+  const { src, width, height, placeholder } =
     await getPlaceholderImage(thumbnailImg);
 
   return (

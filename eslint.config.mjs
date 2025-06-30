@@ -27,6 +27,7 @@ const eslintConfig = defineConfig([
     extends: [
       ...tseslint.configs.recommended,
       pluginReact.configs.flat.recommended,
+      pluginPrettier.configs.recommended,
     ],
     settings: {
       react: {

@@ -1,20 +1,20 @@
 'use client';
-import {Post} from '@/constants/types';
+import { Post } from '@/constants/types';
 import React from 'react';
-import {Card} from 'antd';
+import { Card } from 'antd';
 import dayjs from 'dayjs';
 import Link from 'next/link';
-import {ClockCircleOutlined, LockOutlined} from '@ant-design/icons';
+import { ClockCircleOutlined, LockOutlined } from '@ant-design/icons';
 import ThumbnailImg from './ThumbnailImg';
 
-const {Meta} = Card;
+const { Meta } = Card;
 
 interface PostItemProps {
   post: Post;
 }
 
-const PostItem = ({post}: PostItemProps) => {
-  const {title, createdAt, thumbnailImg, slug} = post;
+const PostItem = ({ post }: PostItemProps) => {
+  const { title, createdAt, thumbnailImg, slug } = post;
 
   return (
     <Link
@@ -28,10 +28,10 @@ const PostItem = ({post}: PostItemProps) => {
           title={title}
           description={
             <div className="flex justify-start items-center">
-              <ClockCircleOutlined style={{marginRight: 4}} />
+              <ClockCircleOutlined style={{ marginRight: 4 }} />
               <p>{dayjs(createdAt).format('YYYY-MM-DD')}</p>
               {!post.visible && (
-                <LockOutlined style={{marginLeft: 20, color: 'black'}} />
+                <LockOutlined style={{ marginLeft: 20, color: 'black' }} />
               )}
             </div>
           }
