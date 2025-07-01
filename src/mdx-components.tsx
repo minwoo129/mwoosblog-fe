@@ -1,4 +1,4 @@
-import type {MDXComponents} from 'mdx/types';
+import type { MDXComponents } from 'mdx/types';
 import Link from 'next/link';
 import BlogTitle from '@/components/screens/post/BlogTitle';
 //import {ThemeType} from './constants/Themes';
@@ -7,7 +7,7 @@ import './app/css/prose.css';
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
   return {
-    a: ({children, href}) => (
+    a: ({ children, href }) => (
       <a href={href} target="_blank" rel="noreferrer">
         {children}
       </a>
