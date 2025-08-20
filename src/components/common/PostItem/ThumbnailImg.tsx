@@ -4,7 +4,7 @@ interface ThumbnailImgProps {
   thumbnailImg: string;
 }
 
-const ThumbnailImg = ({thumbnailImg}: ThumbnailImgProps) => {
+const ThumbnailImg = ({ thumbnailImg }: ThumbnailImgProps) => {
   if (!thumbnailImg) {
     return (
       <div className="aspect-video flex justify-center items-center bg-gray-500" />

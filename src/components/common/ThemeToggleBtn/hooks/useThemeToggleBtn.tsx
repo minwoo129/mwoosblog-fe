@@ -1,10 +1,10 @@
-import {ThemeType} from '@/constants/Themes';
-import {useTheme} from 'next-themes';
-import {useEffect, useMemo, useState} from 'react';
+import { ThemeType } from '@/constants/Themes';
+import { useTheme } from 'next-themes';
+import { useEffect, useMemo, useState } from 'react';
 
 const useThemeToggleBtn = () => {
   const [mounted, setMounted] = useState(false);
-  const {theme, systemTheme, setTheme} = useTheme();
+  const { theme, systemTheme, setTheme } = useTheme();
 
   useEffect(() => {
     if (!mounted) setMounted(true);
@@ -29,7 +29,7 @@ const useThemeToggleBtn = () => {
     setTheme(type);
   };
 
-  return {mounted, currentTheme, handleToggleClick};
+  return { mounted, currentTheme, handleToggleClick };
 
   // return {currentTheme};
 };

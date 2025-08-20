@@ -5,7 +5,7 @@ import LightModeBtnComponent from './components/LightModeBtnComponent';
 import DarkModeBtnComponent from './components/DarkModeBtnComponent';
 
 const ThemeToggleBtn = ({}) => {
-  const {currentTheme, mounted, handleToggleClick} = useThemeToggleBtn();
+  const { currentTheme, mounted, handleToggleClick } = useThemeToggleBtn();
 
   if (!mounted) {
     return null;

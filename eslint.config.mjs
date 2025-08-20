@@ -4,7 +4,7 @@ import pluginPrettier from 'eslint-plugin-prettier';
 import tseslint from 'typescript-eslint';
 import js from '@eslint/js';
 import pluginReact from 'eslint-plugin-react';
-import {defineConfig} from 'eslint/config';
+import { defineConfig } from 'eslint/config';
 
 const eslintConfig = defineConfig([
   js.configs.recommended,

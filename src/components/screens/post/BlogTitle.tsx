@@ -13,7 +13,7 @@ interface TagsProps {
   tags: string[];
 }
 
-const Tags = ({tags}: TagsProps) => {
+const Tags = ({ tags }: TagsProps) => {
   if (tags.length === 0) return null;
 
   return <p>({tags.map((tag, i) => `${i ? ', ' : ''}${tag}`)})</p>;

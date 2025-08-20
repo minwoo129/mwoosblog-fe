@@ -1,5 +1,5 @@
-import {getPosts} from '@/utils/posts';
-import {useCallback} from 'react';
+import { getPosts } from '@/utils/posts';
+import { useCallback } from 'react';
 
 const usePosts = () => {
   const fetchPosts = useCallback(async () => {

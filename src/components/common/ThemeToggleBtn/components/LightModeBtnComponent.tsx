@@ -1,4 +1,4 @@
-import {MdDarkMode} from 'react-icons/md';
+import { MdDarkMode } from 'react-icons/md';
 
 const LightModeBtnComponent = ({
   onClick,

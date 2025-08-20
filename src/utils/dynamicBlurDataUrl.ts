@@ -1,5 +1,5 @@
 'use server';
-import {promises as fs} from 'fs';
+import { promises as fs } from 'fs';
 import path from 'path';
 import sharp from 'sharp';
 
