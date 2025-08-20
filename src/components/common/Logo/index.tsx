@@ -1,12 +1,11 @@
-import React from 'react';
-import '../../../app/css/commonComponents.css';
 import Link from 'next/link';
+import '../../../app/css/commonComponents.css';
 
 interface LogoProps {
   type: 'linked' | 'basic' | 'watermark';
 }
 
-const Logo = ({type}: LogoProps) => {
+const Logo = ({ type }: LogoProps) => {
   if (type === 'basic') {
     return (
       <div className="basicLogo">

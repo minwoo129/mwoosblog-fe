@@ -1,9 +1,9 @@
-import {ReactNode} from 'react';
+import { ReactNode } from 'react';
 import Navigation from './Navigation';
 import Footer from '../Footer';
 //import ThemeToggleBtn from '../../atoms/ThemeToggleBtn';
 
-const BasicLayout = ({children}: {children: ReactNode}) => {
+const BasicLayout = ({ children }: { children: ReactNode }) => {
   return (
     <div className=" flex flex-col w-screen h-screen overflow-hidden">
       <Navigation />

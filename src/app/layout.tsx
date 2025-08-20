@@ -1,11 +1,11 @@
-import type {Metadata} from 'next';
+import type { Metadata } from 'next';
 //import { Geist, Geist_Mono } from "next/font/google";
 import './css/globals.css';
-import {ThemeProvider} from 'next-themes';
+import { ThemeProvider } from 'next-themes';
 import BasicLayout from '@/components/templates/BasicLayout';
 import 'dayjs/locale/ko';
 import dayjs from 'dayjs';
-import {AntdRegistry} from '@ant-design/nextjs-registry';
+import { AntdRegistry } from '@ant-design/nextjs-registry';
 
 dayjs.locale('ko');
 

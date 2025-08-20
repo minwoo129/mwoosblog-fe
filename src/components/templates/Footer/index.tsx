@@ -1,6 +1,5 @@
 /* eslint-disable no-empty-pattern */
 import Logo from '@/components/common/Logo';
-import React from 'react';
 
 const Footer = ({}) => {
   return (
